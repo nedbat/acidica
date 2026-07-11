@@ -1,5 +1,3 @@
-from textwrap import dedent
-
 import pytest
 
 from acidic.tokens import Token, tokenize
@@ -9,22 +7,54 @@ from acidic.tokens import Token, tokenize
     "text, toks",
     [
         (
-            dedent("""\
-                GOSUB 120
-                REM A comment
-                X = Y + 2
-                """),
+            """\
+            10 GOSUB 120
+            20 REM A comment
+            30 X = Y + 2
+            """,
             [
+                Token(kind="num", text="10"),
                 Token(kind="key", text="GO"),
                 Token(kind="key", text="SUB"),
                 Token(kind="num", text="120"),
                 Token(kind="eol", text=""),
+                Token(kind="num", text="20"),
                 Token(kind="eol", text=""),
+                Token(kind="num", text="30"),
                 Token(kind="var", text="X"),
                 Token(kind="op", text="="),
                 Token(kind="var", text="Y"),
                 Token(kind="op", text="+"),
                 Token(kind="num", text="2"),
+                Token(kind="eol", text=""),
+                Token(kind="eol", text=""),
+            ],
+        ),
+        (
+            """\
+            10LETX$="Hello, world!"
+            20F=-.1234e10
+            30FORX=1TO10
+            """,
+            [
+                Token(kind="num", text="10"),
+                Token(kind="key", text="LET"),
+                Token(kind="var", text="X$"),
+                Token(kind="op", text="="),
+                Token(kind="str", text='"Hello, world!"'),
+                Token(kind="eol", text=""),
+                Token(kind="num", text="20"),
+                Token(kind="var", text="F"),
+                Token(kind="op", text="="),
+                Token(kind="num", text="-.1234e10"),
+                Token(kind="eol", text=""),
+                Token(kind="num", text="30"),
+                Token(kind="key", text="FOR"),
+                Token(kind="var", text="X"),
+                Token(kind="op", text="="),
+                Token(kind="num", text="1"),
+                Token(kind="key", text="TO"),
+                Token(kind="num", text="10"),
                 Token(kind="eol", text=""),
                 Token(kind="eol", text=""),
             ],
