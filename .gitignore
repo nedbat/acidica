@@ -1,0 +1,16 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+.coverage
+htmlcov/
+coverage.xml
+
+# Virtual environments
+.venv
+
+# Source material
+vintage-basic-1.0.3/

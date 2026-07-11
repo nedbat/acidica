@@ -1,0 +1,14 @@
+[project]
+name = "acidic"
+version = "0.1.0"
+description = "An implementation of Vintage BASIC"
+readme = "README.rst"
+requires-python = ">=3.14"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "coverage>=7.15.0",
+    "pytest>=9.1.1",
+    "ty>=0.0.58",
+]
