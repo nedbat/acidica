@@ -34,7 +34,7 @@ def program(source: str, output: str) -> tuple[str, str]:
             20 PRINT "boo"
             30 PRINT 1+2+3
             """,
-            "hello\n6\n",
+            "hello\n 6 \n",
         ),
         # Spaces aren't needed
         program(
@@ -43,7 +43,7 @@ def program(source: str, output: str) -> tuple[str, str]:
             20PRINT"boo"
             30PRINT1+2+3
             """,
-            "hello\n6\n",
+            "hello\n 6 \n",
         ),
         # Lines are run in the order of their numbers.
         program(
@@ -52,7 +52,18 @@ def program(source: str, output: str) -> tuple[str, str]:
             30 PRINT 1+2+3
             10 PRINT "hello": GOTO 30
             """,
-            "hello\n6\n",
+            "hello\n 6 \n",
+        ),
+        # Arithmetic
+        program(
+            """
+            1 PRINT "look:"
+            2 PRINT (3*(1+2) - 1) / 2
+            3 PRINT 6-10
+            4 PRINT (3*(1+2) - 1) / 3
+            5 PRINT "bye"
+            """,
+            "look:\n 4 \n-4 \n 2.6666667 \nbye\n",
         ),
     ],
 )

@@ -1,4 +1,3 @@
-
 class Interpreter:
     def run(self, program, instream, outstream):
         self.instream = instream
@@ -22,7 +21,8 @@ class Interpreter:
         match node:
             case ("print", *exprs):
                 for expr in exprs:
-                    print(self.eval(expr), file=self.outstream)
+                    self.print(self.eval(expr))
+                print(file=self.outstream)
 
             case ("goto", line_num):
                 self.next_line = line_num
@@ -33,3 +33,25 @@ class Interpreter:
                 return value
             case ("+", e1, e2):
                 return self.eval(e1) + self.eval(e2)
+            case ("-", e1, e2):
+                return self.eval(e1) - self.eval(e2)
+            case ("*", e1, e2):
+                return self.eval(e1) * self.eval(e2)
+            case ("/", e1, e2):
+                return self.eval(e1) / self.eval(e2)
+
+    def print(self, value):
+        if isinstance(value, str):
+            print(value, end="", file=self.outstream)
+        else:
+            if value >= 0:
+                pad = " "
+            else:
+                pad = ""
+
+            if value == int(value):
+                digits = 0
+            else:
+                digits = 7
+
+            print(f"{pad}{value:.{digits}f} ", end="", file=self.outstream)
