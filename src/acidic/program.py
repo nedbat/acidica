@@ -8,12 +8,14 @@ class Program:
 
 
 class Interpreter:
-    def run(self, program):
+    def run(self, program, instream, outstream):
+        self.instream = instream
+        self.outstream = outstream
         self.cur_line = program.first
         self.next_line = None
         while True:
             for stmt in program.lines[self.cur_line]:
-                self.run_one(stmt)
+                self.exec(stmt)
                 if self.next_line:
                     break
             if self.next_line:
@@ -24,11 +26,11 @@ class Interpreter:
                 if self.cur_line is None:
                     break
 
-    def run_one(self, node):
+    def exec(self, node):
         match node:
             case ("print", *exprs):
                 for expr in exprs:
-                    print(self.eval(expr))
+                    print(self.eval(expr), file=self.outstream)
 
             case ("goto", line_num):
                 self.next_line = line_num
@@ -39,4 +41,3 @@ class Interpreter:
                 return value
             case ("+", e1, e2):
                 return self.eval(e1) + self.eval(e2)
-

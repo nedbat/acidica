@@ -1,3 +1,4 @@
+import sys
 import textwrap
 
 from .parser import Parser
@@ -17,4 +18,4 @@ def main():
     print("first: ", prog.first)
     print(prog.nexts)
     print("-" * 40)
-    Interpreter().run(prog)
+    Interpreter().run(prog, None, sys.stdout)
