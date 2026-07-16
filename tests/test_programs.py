@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 from acidic.parser import Parser
-from acidic.program import Interpreter
+from acidic.interpreter import Interpreter
 
 
 def easy_text(text: str) -> str:
@@ -28,7 +28,7 @@ def program(source: str, output: str) -> tuple[str, str]:
     "source, output",
     [
         # First program
-        (
+        program(
             """
             10 PRINT "hello": GOTO 30
             20 PRINT "boo"
@@ -37,7 +37,7 @@ def program(source: str, output: str) -> tuple[str, str]:
             "hello\n6\n",
         ),
         # Spaces aren't needed
-        (
+        program(
             """
             10PRINT"hello":GOTO30
             20PRINT"boo"
@@ -46,7 +46,7 @@ def program(source: str, output: str) -> tuple[str, str]:
             "hello\n6\n",
         ),
         # Lines are run in the order of their numbers.
-        (
+        program(
             """
             20 PRINT "boo"
             30 PRINT 1+2+3

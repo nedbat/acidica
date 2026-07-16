@@ -97,7 +97,7 @@ class Parser:
         match tok:
             case Token("num", _) | Token("str", _):
                 self.eat()
-                return ("literal", tok.value())
+                return ("value", tok.value())
             case Token("lparen", _):
                 self.eat()
                 node = self.expr()
