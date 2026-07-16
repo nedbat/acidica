@@ -12,3 +12,6 @@ dev = [
     "pytest>=9.1.1",
     "ty>=0.0.58",
 ]
+
+[project.scripts]
+acidic = "acidic.acidic:main"

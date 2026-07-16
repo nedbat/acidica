@@ -1,0 +1,105 @@
+from typing import Never
+
+from .program import Program
+from .tokens import Token, tokenize
+
+
+class Parser:
+    def __init__(self, text: str) -> None:
+        self.toks = tokenize(text)
+        self.tok = next(self.toks)
+
+    def error(self) -> Never:
+        raise Exception("Syntax error!")
+
+    def eat(self, kind=None) -> None:
+        if kind is None or self.tok.kind == kind:
+            self.tok = next(self.toks)
+        else:
+            self.error()
+
+    def parse(self) -> Program:
+        lines = {}
+        while True:
+            # Start of a line: need a line number
+            if self.tok.kind == "eol":
+                try:
+                    self.eat()
+                except StopIteration:
+                    break
+                continue
+            if self.tok.kind != "num":
+                raise Exception(f"No line number, got {self.tok}!")
+            line_num = self.tok.value()
+
+            if line_num in lines:
+                raise Exception(f"Duplicate line number: {line_num}")
+
+            self.eat()
+            lines[line_num] = line = []
+
+            while True:
+                match self.tok:
+                    case Token("eol", _):
+                        self.eat()
+                        while line and not line[-1]:
+                            line.pop()
+                        break
+
+                    case Token("colon", _):
+                        self.eat()
+
+                    case Token("key", "GO"):
+                        self.eat()
+                        match self.tok:
+                            case Token("key", "TO"):
+                                self.eat()
+                                if self.tok.kind != "num":
+                                    self.error()
+                                line.append(("goto", self.tok.value()))
+                                self.eat()
+                            case Token("key", "SUB"):
+                                pass
+                            case _:
+                                self.error()
+
+                    case Token("key", "PRINT"):
+                        self.eat()
+                        line.append(("print", self.expr()))
+
+                    case _:
+                        line.append(self.tok)
+                        self.eat()
+
+        return Program(lines)
+
+    def expr(self):
+        node = self.term()
+
+        while self.tok.kind == "op" and self.tok.text in {"+", "-"}:
+            op = self.tok.text
+            self.eat()
+            node = (op, node, self.term())
+
+        return node
+
+    def term(self):
+        node = self.factor()
+        while self.tok.kind == "op" and self.tok.text in {"*", "/"}:
+            op = self.tok.text
+            self.eat()
+            node = (op, node, self.factor())
+
+        return node
+
+    def factor(self):
+        tok = self.tok
+        match tok:
+            case Token("num", _) | Token("str", _):
+                self.eat()
+                return ("literal", tok.value())
+            case Token("lparen", _):
+                self.eat()
+                node = self.expr()
+                self.eat("rparen")
+                return node
