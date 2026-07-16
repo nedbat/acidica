@@ -1,5 +1,5 @@
 [project]
-name = "acidic"
+name = "acidica"
 version = "0.1.0"
 description = "An implementation of Vintage BASIC"
 readme = "README.rst"
@@ -14,4 +14,4 @@ dev = [
 ]
 
 [project.scripts]
-acidic = "acidic.acidic:main"
+acidica = "acidica.main:main"

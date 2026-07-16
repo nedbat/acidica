@@ -4,8 +4,8 @@ from pathlib import Path
 
 import pytest
 
-from acidic.parser import Parser
-from acidic.interpreter import Interpreter
+from acidica.parser import Parser
+from acidica.interpreter import Interpreter
 
 
 def easy_text(text: str) -> str:
