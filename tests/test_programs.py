@@ -200,11 +200,11 @@ TEST_PROGRAMS = [
         "",
         error="!Incorrect type: can't assign 12 to X$ on line 10",
     ),
-    # LET is implicit
+    # LET is implicit, and ? is the same as PRINT
     program(
         """
         10 PI = 3.1416: PI$ = "pi": PI% = 3
-        20 PRINT "PI ="; PI; "; PI$ = "; PI$; "; PI% ="; PI%
+        20 ? "PI ="; PI; "; PI$ = "; PI$; "; PI% ="; PI%
         """,
         "PI = 3.1416 ; PI$ = pi; PI% = 3 \n",
     ),

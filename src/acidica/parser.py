@@ -76,7 +76,7 @@ class Parser:
                             case _:
                                 self.error()
 
-                    case Token("key", "PRINT"):
+                    case Token("key", "PRINT") | Token("key", "?"):
                         self.eat()
                         items = []
                         while True:
