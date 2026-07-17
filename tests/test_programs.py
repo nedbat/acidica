@@ -177,6 +177,13 @@ TEST_PROGRAMS = [
         "",
         error="!Syntax error on line 10: '24'",
     ),
+    program(
+        """
+        10 REM undefined variables start as zero or empty string
+        20 PRINT "empty:"; X; "and empty:"; X$; "."
+        """,
+        "empty: 0 and empty:.\n",
+    ),
     # Types of values have to match type of variable
     program(
         """

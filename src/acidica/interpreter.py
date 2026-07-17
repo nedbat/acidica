@@ -79,7 +79,10 @@ class Interpreter:
             case ("value", value):
                 return value
             case ("var", var):
-                return self.variables[var]
+                value = self.variables.get(var)
+                if value is None:
+                    value = types(var)[0]()
+                return value
             case ("+", e1, e2):
                 return self.eval(e1) + self.eval(e2)
             case ("-", e1, e2):
