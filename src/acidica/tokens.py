@@ -61,5 +61,10 @@ TOKENS = rf"""(?xmi)
 
 
 def tokenize(text: str) -> Iterator[Token]:
-    matches = re.finditer(TOKENS, text)
-    return (Token(m.lastgroup, m.group()) for m in matches if m.lastgroup)
+    for m in re.finditer(TOKENS, text):
+        if m.lastgroup:
+            kind = m.lastgroup
+            text = m.group()
+            if kind in {"key", "fn", "var", "op"}:
+                text = text.upper()
+            yield Token(kind, text)

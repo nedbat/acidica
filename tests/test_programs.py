@@ -45,6 +45,15 @@ def program(source: str, output: str) -> tuple[str, str]:
             """,
             "hello\n 6 \n",
         ),
+        # Keywords are case-insensitive
+        program(
+            """
+            10print"hello":GoTo30
+            20Print"boo"
+            30pRiNt1+2+3
+            """,
+            "hello\n 6 \n",
+        ),
         # Lines are run in the order of their numbers.
         program(
             """
