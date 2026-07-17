@@ -78,7 +78,11 @@ class Interpreter:
                 self.variables[var] = val
 
             case ("next", var):
-                assert var is None
+                if var is not None:
+                    while self.loops and self.loops[-1].var != var:
+                        self.loops.pop()
+                if not self.loops:
+                    self.error("No matching loop found")
                 loop = self.loops[-1]
                 loop.val += loop.step
                 if loop.step > 0:

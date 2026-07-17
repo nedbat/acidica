@@ -103,6 +103,7 @@ class Parser:
                         self.eat()
                         if self.tok.kind == "var":
                             var = self.tok.text
+                            self.eat()
                         else:
                             var = None
                         line.append(("next", var))

@@ -287,6 +287,33 @@ TEST_PROGRAMS = [
         "",
         error="!Syntax error on line 10: '3.14159'",
     ),
+    # Named NEXT
+    program(
+        """
+        5 print "LOOK:";
+        10 for i = 1 to 5
+        20 for j = 1 to 5
+        30 print j;
+        40 next i
+        50 print
+        """,
+        "LOOK: 1  1  1  1  1 \n",
+    ),
+    program(
+        """
+        10 next i
+        """,
+        "",
+        error="!No matching loop found on line 10",
+    ),
+    program(
+        """
+        10 for i = 1 to 10
+        20 next j
+        """,
+        "",
+        error="!No matching loop found on line 20",
+    ),
 ]
 
 
