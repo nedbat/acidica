@@ -1,3 +1,5 @@
+from typing import Never
+
 from .exceptions import AcidicaError
 
 

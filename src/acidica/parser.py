@@ -72,12 +72,7 @@ class Parser:
                         self.eat()
                         match self.tok:
                             case Token("var", _):
-                                var = self.tok.text
-                                self.eat()
-                                if self.tok != Token("op", "="):
-                                    self.error()
-                                self.eat()
-                                line.append(("let", var, self.expr()))
+                                line.append(self.parse_let())
                             case _:
                                 self.error()
 
@@ -98,10 +93,21 @@ class Parser:
                                     items.append(item)
                         line.append(("print", *items))
 
+                    case Token("var", _):
+                        line.append(self.parse_let())
+
                     case _:
                         self.error()
 
         return Program(lines)
+
+    def parse_let(self):
+        var = self.tok.text
+        self.eat()
+        if self.tok != Token("op", "="):
+            self.error()
+        self.eat()
+        return ("let", var, self.expr())
 
     def expr(self):
         node = self.term()
