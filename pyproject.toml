@@ -15,3 +15,10 @@ dev = [
 
 [project.scripts]
 acidica = "acidica.main:main"
+
+[tool.coverage.report]
+# Regexes for lines to exclude from consideration
+exclude_also = [
+    # Don't complain about missing default cases that are never meant to happen.
+    "case NEVER:",
+]

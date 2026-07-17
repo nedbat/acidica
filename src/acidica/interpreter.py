@@ -56,7 +56,7 @@ class Interpreter:
                     self.cur_col = 0
                     self.next_col = 0
 
-            case _:
+            case NEVER:
                 self.error(f"Unimplemented: {node}")
 
     def eval(self, expr):
@@ -77,6 +77,8 @@ class Interpreter:
                 if v2 == 0:
                     self.error("Division by zero")
                 return v1 / v2
+            case NEVER:
+                self.error(f"Unimplemented: {expr}")
 
     def print(self, value):
         if isinstance(value, str):

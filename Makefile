@@ -7,4 +7,5 @@ typecheck:
 
 test:
 	coverage run --branch -m pytest
-	coverage report --show-missing
+	coverage report --show-missing --skip-covered
+	coverage html --skip-covered
