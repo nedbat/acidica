@@ -1,5 +1,6 @@
 from typing import Never
 
+from .exceptions import AcidicaError
 from .program import Program
 from .tokens import Token, tokenize
 
@@ -8,9 +9,15 @@ class Parser:
     def __init__(self, text: str) -> None:
         self.toks = tokenize(text)
         self.tok = next(self.toks)
+        self.line_num = None
 
-    def error(self) -> Never:
-        raise Exception("Syntax error!")
+    def error(self, line_num=True, token=True) -> Never:
+        msg = "!Syntax error"
+        if line_num:
+            msg += f" on line {self.line_num}"
+        if token:
+            msg += f": '{self.tok.text}'"
+        raise AcidicaError(msg)
 
     def eat(self, kind=None) -> None:
         if kind is None or self.tok.kind == kind:
@@ -30,13 +37,13 @@ class Parser:
                 continue
             if self.tok.kind != "num":
                 raise Exception(f"No line number, got {self.tok}!")
-            line_num = self.tok.value()
+            self.line_num = self.tok.value()
 
-            if line_num in lines:
-                raise Exception(f"Duplicate line number: {line_num}")
+            if self.line_num in lines:
+                raise Exception(f"Duplicate line number: {self.line_num}")
 
             self.eat()
-            lines[line_num] = line = []
+            lines[self.line_num] = line = []
 
             while True:
                 match self.tok:
@@ -76,7 +83,7 @@ class Parser:
                                 case _:
                                     item = self.expr()
                                     if item is None:
-                                        raise Exception("Bad print item")
+                                        self.error()
                                     items.append(item)
                         line.append(("print", *items))
 

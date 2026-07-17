@@ -1,31 +1,39 @@
 import io
+import re
 import textwrap
 from pathlib import Path
 
 import pytest
 
+from acidica.exceptions import AcidicaError
 from acidica.parser import Parser
 from acidica.interpreter import Interpreter
 
 
 def easy_text(text: str) -> str:
-    if "\n" in text:
-        # Multi-line string: it's actual data.
-        if text[0] == "\n":  # Remove a first newline
-            text = text[1:]
-        text = textwrap.dedent(text)
-    else:
-        # One-line string: it's a file name.
-        text = Path(text).read_text()
+    if text:
+        if re.search(r"\s", text):
+            # White space in string: it's the data.
+            if text[0] == "\n":  # Remove a first newline
+                text = text[1:]
+            text = textwrap.dedent(text)
+        else:
+            # One-line string: it's a file name.
+            text = Path(text).read_text()
     return text
 
 
-def program(source: str, output: str) -> tuple[str, str]:
-    return (easy_text(source), easy_text(output))
+def program(
+    source: str,
+    output: str,
+    *,
+    error: str | None = None,
+) -> tuple[str, str, str | None]:
+    return (easy_text(source), easy_text(output), error)
 
 
 @pytest.mark.parametrize(
-    "source, output",
+    "source, output, error",
     [
         # First program
         program(
@@ -106,10 +114,21 @@ def program(source: str, output: str) -> tuple[str, str]:
                                         AA            XYZ
             """,
         ),
+        # Error handling
+        program(
+            "17 PRINT LET",
+            "",
+            error="!Syntax error on line 17: 'LET'",
+        ),
     ],
 )
-def test_program(source, output):
+def test_program(source, output, error):
     outstream = io.StringIO()
-    prog = Parser(source).parse()
-    Interpreter().run(prog, instream=None, outstream=outstream)
+    try:
+        prog = Parser(source).parse()
+        Interpreter().run(prog, instream=None, outstream=outstream)
+    except AcidicaError as e:
+        assert str(e) == error
+    else:
+        assert error is None
     assert outstream.getvalue() == output
