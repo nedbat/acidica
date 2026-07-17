@@ -154,6 +154,11 @@ TEST_PROGRAMS = [
         "hello\n",
         error="!Division by zero on line 101",
     ),
+    program(
+        "10 PRINT (X+",
+        "",
+        error="!Expected rparen, saw eol on line 10",
+    ),
     # Variables
     program(
         """
@@ -191,7 +196,7 @@ TEST_PROGRAMS = [
         error="!Incorrect type: can't assign 'hello' to X% on line 10",
     ),
     program(
-        '10 LET X$ = 12',
+        "10 LET X$ = 12",
         "",
         error="!Incorrect type: can't assign 12 to X$ on line 10",
     ),

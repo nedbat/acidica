@@ -14,7 +14,7 @@ class Parser:
     def error(self, msg="Syntax error", line_num=True, token=True) -> Never:
         if line_num:
             msg += f" on line {self.line_num}"
-        if token:
+        if token and self.tok.text:
             msg += f": '{self.tok.text}'"
         raise AcidicaError(msg)
 
@@ -22,7 +22,7 @@ class Parser:
         if kind is None or self.tok.kind == kind:
             self.tok = next(self.toks)
         else:
-            self.error()
+            self.error(f"Expected {kind}, saw {self.tok.kind}")
 
     def parse(self) -> Program:
         lines = {}
@@ -65,8 +65,6 @@ class Parser:
                                     self.error()
                                 line.append(("goto", self.tok.value()))
                                 self.eat()
-                            case Token("key", "SUB"):
-                                pass
                             case _:
                                 self.error()
 
