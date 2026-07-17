@@ -12,6 +12,7 @@ def main():
             10 PRINT "hello": GOTO 30
             20 PRINT "boo"
             30 PRINT 1+2+3
+            40 PRINT 1;2
         """)
     ).parse()
     pprint.pprint(prog.lines)

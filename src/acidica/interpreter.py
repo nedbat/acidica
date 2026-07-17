@@ -2,8 +2,12 @@ class Interpreter:
     def run(self, program, instream, outstream):
         self.instream = instream
         self.outstream = outstream
+
         self.cur_line = program.first
         self.next_line = None
+        self.cur_col = 0
+        self.next_col = 0
+
         while True:
             for stmt in program.lines[self.cur_line]:
                 self.exec(stmt)
@@ -20,9 +24,21 @@ class Interpreter:
     def exec(self, node):
         match node:
             case ("print", *exprs):
+                newline = True
                 for expr in exprs:
-                    self.print(self.eval(expr))
-                print(file=self.outstream)
+                    match expr:
+                        case ("comma",):
+                            newline = False
+                            self.next_col = (max(self.cur_col, self.next_col) + 14) // 14 * 14
+                        case ("semicolon",):
+                            newline = False
+                        case _:
+                            self.print(self.eval(expr))
+                            newline = True
+                if newline:
+                    print(file=self.outstream)
+                    self.cur_col = 0
+                    self.next_col = 0
 
             case ("goto", line_num):
                 self.next_line = line_num
@@ -42,7 +58,7 @@ class Interpreter:
 
     def print(self, value):
         if isinstance(value, str):
-            print(value, end="", file=self.outstream)
+            out = value
         else:
             if value >= 0:
                 pad = " "
@@ -54,4 +70,8 @@ class Interpreter:
             else:
                 digits = 7
 
-            print(f"{pad}{value:.{digits}f} ", end="", file=self.outstream)
+            out = f"{pad}{value:.{digits}f} "
+
+        nspaces = self.next_col - self.cur_col
+        print(" " * nspaces + out, end="", file=self.outstream)
+        self.cur_col += nspaces + len(out)

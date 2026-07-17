@@ -65,7 +65,20 @@ class Parser:
 
                     case Token("key", "PRINT"):
                         self.eat()
-                        line.append(("print", self.expr()))
+                        items = []
+                        while True:
+                            match self.tok:
+                                case Token("comma", _) | Token("semicolon", _):
+                                    items.append((self.tok.kind,))
+                                    self.eat()
+                                case Token("colon", _) | Token("eol", _):
+                                    break
+                                case _:
+                                    item = self.expr()
+                                    if item is None:
+                                        raise Exception("Bad print item")
+                                    items.append(item)
+                        line.append(("print", *items))
 
                     case _:
                         line.append(self.tok)

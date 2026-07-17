@@ -65,6 +65,38 @@ def program(source: str, output: str) -> tuple[str, str]:
             """,
             "look:\n 4 \n-4 \n 2.6666667 \nbye\n",
         ),
+        # Semicolons control spacing
+        program(
+            """
+            3 PRINT;;
+            4 PRINT"hi";
+            5 PRINT"there"
+            6 PRINT1;2;;3;"X"
+            """,
+            "hithere\n 1  2  3 X\n",
+        ),
+        # Commas jump to the next 14-space zone
+        program(
+            """
+            10 PRINT "X", "Y", "Z"
+            20 PRINT "XX", "YY", "ZZ"
+            30 PRINT "AAAAAAAAAAAAAAHAA", "YY", "ZZ"
+            32 PRINT "AAAAAAAAAAAAA", "YY", "ZZ"
+            35 PRINT "AAAAAAAAAAAAAA", "YY", "ZZ"
+            40 PRINT ,"ZZZ"
+            50 PRINT ,,"AA",
+            60 PRINT "XYZ"
+            """,
+            """
+            X             Y             Z
+            XX            YY            ZZ
+            AAAAAAAAAAAAAAHAA           YY            ZZ
+            AAAAAAAAAAAAA YY            ZZ
+            AAAAAAAAAAAAAA              YY            ZZ
+                          ZZZ
+                                        AA            XYZ
+            """,
+        ),
     ],
 )
 def test_program(source, output):
