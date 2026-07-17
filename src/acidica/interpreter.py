@@ -10,6 +10,7 @@ class Interpreter:
         self.next_line = None
         self.cur_col = 0
         self.next_col = 0
+        self.variables = {}
 
         while True:
             for stmt in program.lines[self.cur_line]:
@@ -30,6 +31,12 @@ class Interpreter:
 
     def exec(self, node):
         match node:
+            case ("goto", line_num):
+                self.next_line = line_num
+
+            case ("let", var, expr):
+                self.variables[var] = self.eval(expr)
+
             case ("print", *exprs):
                 newline = True
                 for expr in exprs:
@@ -49,13 +56,15 @@ class Interpreter:
                     self.cur_col = 0
                     self.next_col = 0
 
-            case ("goto", line_num):
-                self.next_line = line_num
+            case _:
+                self.error(f"Unimplemented: {node}")
 
     def eval(self, expr):
         match expr:
             case ("value", value):
                 return value
+            case ("var", var):
+                return self.variables[var]
             case ("+", e1, e2):
                 return self.eval(e1) + self.eval(e2)
             case ("-", e1, e2):

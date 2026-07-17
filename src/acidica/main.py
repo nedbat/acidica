@@ -17,6 +17,8 @@ def main():
             20 PRINT "boo"
             30 PRINT 1+2+3
             40 PRINT 1;2
+            50 LET X = 1 +1
+            60 PRINT X
         """)
     try:
         prog = Parser(source).parse()

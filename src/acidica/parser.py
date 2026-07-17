@@ -71,6 +71,19 @@ class Parser:
                             case _:
                                 self.error()
 
+                    case Token("key", "LET"):
+                        self.eat()
+                        match self.tok:
+                            case Token("var", _):
+                                var = self.tok.text
+                                self.eat()
+                                if self.tok != Token("op", "="):
+                                    self.error()
+                                self.eat()
+                                line.append(("let", var, self.expr()))
+                            case _:
+                                self.error()
+
                     case Token("key", "PRINT"):
                         self.eat()
                         items = []
@@ -118,6 +131,9 @@ class Parser:
             case Token("num", _) | Token("str", _):
                 self.eat()
                 return ("value", tok.value())
+            case Token("var", var):
+                self.eat()
+                return ("var", var)
             case Token("lparen", _):
                 self.eat()
                 node = self.expr()

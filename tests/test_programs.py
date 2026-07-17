@@ -154,6 +154,24 @@ TEST_PROGRAMS = [
         "hello\n",
         error="!Division by zero on line 101",
     ),
+    # Variables
+    program(
+        """
+        10 LET X = 10 * (2 + 3)
+        20 PRINT "fifty ="; X
+        """,
+        "fifty = 50 \n",
+    ),
+    program(
+        "10 LET 12 = 10 + 2",
+        "",
+        error="!Syntax error on line 10: '12'",
+    ),
+    program(
+        "10 LET X 24",
+        "",
+        error="!Syntax error on line 10: '24'",
+    ),
 ]
 
 
