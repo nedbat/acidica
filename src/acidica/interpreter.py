@@ -1,6 +1,15 @@
 from .exceptions import AcidicaError
 
 
+def types(var: str):
+    if var.endswith("%"):
+        return (int,)
+    elif var.endswith("$"):
+        return (str,)
+    else:
+        return (int, float)
+
+
 class Interpreter:
     def run(self, program, instream, outstream):
         self.instream = instream
@@ -35,7 +44,11 @@ class Interpreter:
                 self.next_line = line_num
 
             case ("let", var, expr):
-                self.variables[var] = self.eval(expr)
+                val = self.eval(expr)
+                ok_types = types(var)
+                if not isinstance(val, ok_types):
+                    self.error(f"Incorrect type: can't assign {val!r} to {var}")
+                self.variables[var] = val
 
             case ("print", *exprs):
                 newline = True
@@ -84,17 +97,12 @@ class Interpreter:
         if isinstance(value, str):
             out = value
         else:
+            out = ""
             if value >= 0:
-                pad = " "
-            else:
-                pad = ""
+                out += " "
 
-            if value == int(value):
-                digits = 0
-            else:
-                digits = 7
-
-            out = f"{pad}{value:.{digits}f} "
+            out += f"{value:.7f}".rstrip("0").rstrip(".")
+            out += " "
 
         nspaces = self.next_col - self.cur_col
         print(" " * nspaces + out, end="", file=self.outstream)

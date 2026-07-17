@@ -172,6 +172,29 @@ TEST_PROGRAMS = [
         "",
         error="!Syntax error on line 10: '24'",
     ),
+    # Types of values have to match type of variable
+    program(
+        """
+        10 LET PI = 3.1416: LET PI$ = "pi": LET PI% = 3
+        20 PRINT "PI ="; PI; "; PI$ = "; PI$; "; PI% ="; PI%
+        """,
+        "PI = 3.1416 ; PI$ = pi; PI% = 3 \n",
+    ),
+    program(
+        '10 LET X = "hello"',
+        "",
+        error="!Incorrect type: can't assign 'hello' to X on line 10",
+    ),
+    program(
+        '10 LET X% = "hello"',
+        "",
+        error="!Incorrect type: can't assign 'hello' to X% on line 10",
+    ),
+    program(
+        '10 LET X$ = 12',
+        "",
+        error="!Incorrect type: can't assign 12 to X$ on line 10",
+    ),
 ]
 
 

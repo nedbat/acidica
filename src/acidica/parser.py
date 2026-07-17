@@ -51,7 +51,6 @@ class Parser:
             while True:
                 match self.tok:
                     case Token("eol", _):
-                        self.eat()
                         break
 
                     case Token("colon", _):
