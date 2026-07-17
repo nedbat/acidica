@@ -56,6 +56,29 @@ class Parser:
                     case Token("colon", _):
                         self.eat()
 
+                    case Token("key", "FOR"):
+                        self.eat()
+                        if self.tok.kind != "var":
+                            self.error()
+                        var = self.tok.text
+                        self.eat()
+                        if self.tok != Token("op", "="):
+                            self.error()
+                        self.eat()
+                        start = self.expr()
+                        if self.tok != Token("key", "TO"):
+                            self.error()
+                        self.eat()
+                        end = self.expr()
+                        if self.tok == Token("key", "STEP"):
+                            self.eat()
+                            step = self.expr()
+                            if step is None:
+                                self.error()
+                        else:
+                            step = ("value", 1)
+                        line.append(("for", var, start, end, step))
+
                     case Token("key", "GO"):
                         self.eat()
                         match self.tok:
@@ -75,6 +98,14 @@ class Parser:
                                 line.append(self.parse_let())
                             case _:
                                 self.error()
+
+                    case Token("key", "NEXT"):
+                        self.eat()
+                        if self.tok.kind == "var":
+                            var = self.tok.text
+                        else:
+                            var = None
+                        line.append(("next", var))
 
                     case Token("key", "PRINT") | Token("key", "?"):
                         self.eat()

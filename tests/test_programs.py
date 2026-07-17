@@ -224,6 +224,69 @@ TEST_PROGRAMS = [
         """,
         "lines12 = 13 \n",
     ),
+    # For loops
+    program(
+        """
+        20 print"numbers:";: For I = 1 to 5: print i;: next: print
+        """,
+        "numbers: 1  2  3  4  5 \n",
+    ),
+    program(
+        """
+        10 print "countdown:";
+        20 For I = 5 to 1 step 1-2
+        30 print i;
+        40 next
+        50 print
+        """,
+        "countdown: 5  4  3  2  1 \n",
+    ),
+    program(
+        """
+        5 print "numbers:";
+        10 for i = 1 to 5
+        20 for j = 1 to i
+        30 print j;
+        40 next
+        50 print "."
+        60 next
+        """,
+        """
+        numbers: 1 .
+         1  2 .
+         1  2  3 .
+         1  2  3  4 .
+         1  2  3  4  5 .
+        """,
+    ),
+    # Loop errors
+    program(
+        "10 for 12",
+        "",
+        error="!Syntax error on line 10: '12'",
+    ),
+    program(
+        "10 for i 1 10",
+        "",
+        error="!Syntax error on line 10: '1'",
+    ),
+    program(
+        "10 for i = 1 10",
+        "",
+        error="!Syntax error on line 10: '10'",
+    ),
+    program(
+        "10 for i = 1 to 10 Step LET",
+        "",
+        error="!Syntax error on line 10: 'LET'",
+    ),
+    program(
+        """
+        10 next 3.14159
+        """,
+        "",
+        error="!Syntax error on line 10: '3.14159'",
+    ),
 ]
 
 

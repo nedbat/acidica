@@ -13,12 +13,8 @@ def main():
         source = Path(sys.argv[1]).read_text()
     else:
         source = textwrap.dedent("""\
-            10 PRINT "hello": GOTO 30
-            20 PRINT "boo"
-            30 PRINT 1+2+3
-            40 PRINT 1;2
-            50 LET X = 1 +1
-            60 PRINT X
+            60 for i = 1 to (X * 2)
+            70 for j = 2 to 100 step 20
         """)
     try:
         prog = Parser(source).parse()

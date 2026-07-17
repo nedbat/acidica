@@ -1,3 +1,4 @@
+import dataclasses
 from typing import Never
 
 from .exceptions import AcidicaError
@@ -12,29 +13,39 @@ def types(var: str):
         return (int, float)
 
 
+@dataclasses.dataclass
+class Loop:
+    var: str
+    line: int
+    subline: int
+    val: float
+    step: float
+    end: float
+
+
 class Interpreter:
     def run(self, program, instream, outstream):
         self.instream = instream
         self.outstream = outstream
 
         self.cur_line = program.first
-        self.next_line = None
+        self.cur_subline = 0
         self.cur_col = 0
         self.next_col = 0
         self.variables = {}
+        self.loops = []
 
         while True:
-            for stmt in program.lines[self.cur_line]:
-                self.exec(stmt)
-                if self.next_line:
-                    break
-            if self.next_line:
-                self.cur_line = self.next_line
-                self.next_line = None
-            else:
+            line = program.lines[self.cur_line]
+            if self.cur_subline >= len(line):
                 self.cur_line = program.nexts.get(self.cur_line)
                 if self.cur_line is None:
                     break
+                self.cur_subline = 0
+                continue
+
+            self.exec(program.lines[self.cur_line][self.cur_subline])
+            self.cur_subline += 1
 
     def error(self, msg: str) -> Never:
         msg += f" on line {self.cur_line}"
@@ -42,8 +53,22 @@ class Interpreter:
 
     def exec(self, node):
         match node:
+            case ("for", var, start, end, step):
+                val = self.eval(start)
+                loop = Loop(
+                    var=var,
+                    line=self.cur_line,
+                    subline=self.cur_subline,
+                    val=val,
+                    step=self.eval(step),
+                    end=self.eval(end),
+                )
+                self.loops.append(loop)
+                self.variables[var] = val
+
             case ("goto", line_num):
-                self.next_line = line_num
+                self.cur_line = line_num
+                self.cur_subline = -1  # the main loop will increment it
 
             case ("let", var, expr):
                 val = self.eval(expr)
@@ -51,6 +76,21 @@ class Interpreter:
                 if not isinstance(val, ok_types):
                     self.error(f"Incorrect type: can't assign {val!r} to {var}")
                 self.variables[var] = val
+
+            case ("next", var):
+                assert var is None
+                loop = self.loops[-1]
+                loop.val += loop.step
+                if loop.step > 0:
+                    more = loop.val <= loop.end
+                else:
+                    more = loop.val >= loop.end
+                if more:
+                    self.variables[loop.var] = loop.val
+                    self.cur_line = loop.line
+                    self.cur_subline = loop.subline
+                else:
+                    self.loops.pop()
 
             case ("print", *exprs):
                 newline = True
