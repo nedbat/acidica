@@ -23,19 +23,23 @@ class Token:
                 return self.text
 
 
-KEYWORDS = "|".join("""
+KEYWORDS = "|".join(
+    """
     DATA DEF FN DIM END FOR TO STEP GO SUB IF THEN INPUT LET NEXT ON PRINT 
     RANDOMIZE READ RESTORE RETURN STOP
-    """.split())
+    """.split()
+)
 
-FUNCTIONS = "|".join("""
+FUNCTIONS = "|".join(
+    """
     ABS ASC ATN CHR$ COS EXP INT LEFT$ LEN LOG MID$ RIGHT$ RND SGN SIN SPC SQR
     STR TAB TAN VAL
-    """.split())
+    """.split()
+)
 
 OPWORDS = "|".join("NOT AND OR".split())
 
-TOKENS = rf"""(?xm)
+TOKENS = rf"""(?xmi)
     (?:
         (REM.*$)                                            |
         (?P<lparen>\()                                      |

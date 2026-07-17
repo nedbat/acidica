@@ -29,7 +29,9 @@ class Interpreter:
                     match expr:
                         case ("comma",):
                             newline = False
-                            self.next_col = (max(self.cur_col, self.next_col) + 14) // 14 * 14
+                            self.next_col = (
+                                (max(self.cur_col, self.next_col) + 14) // 14 * 14
+                            )
                         case ("semicolon",):
                             newline = False
                         case _:

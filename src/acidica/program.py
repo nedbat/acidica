@@ -1,5 +1,6 @@
 import itertools
 
+
 class Program:
     def __init__(self, lines):
         self.lines: dict[int, list] = lines
