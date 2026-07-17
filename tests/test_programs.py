@@ -215,6 +215,15 @@ TEST_PROGRAMS = [
         """,
         "PI = 3.1416 ; PI$ = pi; PI% = 3 \n",
     ),
+    # In variable names, only the first two letters and the first digit are
+    # significant
+    program(
+        """
+        10 LINES12 = 13
+        20 PRINT "lines12 ="; LIB100
+        """,
+        "lines12 = 13 \n",
+    ),
 ]
 
 

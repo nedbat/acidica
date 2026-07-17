@@ -67,4 +67,8 @@ def tokenize(text: str) -> Iterator[Token]:
             text = m.group()
             if kind in {"key", "fn", "var", "op"}:
                 text = text.upper()
+            if kind == "var":
+                # Only the first two letters and the first digit are significant.
+                m = re.fullmatch(r"([A-Z]{,2})[A-Z]*([0-9]?)[0-9]*([$%]?)", text)
+                text = "".join(m.groups())
             yield Token(kind, text)
