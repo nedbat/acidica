@@ -11,8 +11,7 @@ class Parser:
         self.tok = next(self.toks)
         self.line_num = None
 
-    def error(self, line_num=True, token=True) -> Never:
-        msg = "!Syntax error"
+    def error(self, msg="Syntax error", line_num=True, token=True) -> Never:
         if line_num:
             msg += f" on line {self.line_num}"
         if token:
@@ -36,11 +35,15 @@ class Parser:
                     break
                 continue
             if self.tok.kind != "num":
-                raise Exception(f"No line number, got {self.tok}!")
+                self.error("No line number", line_num=False)
             self.line_num = self.tok.value()
 
             if self.line_num in lines:
-                raise Exception(f"Duplicate line number: {self.line_num}")
+                self.error(
+                    f"Duplicate line number {self.line_num}",
+                    token=False,
+                    line_num=False,
+                )
 
             self.eat()
             lines[self.line_num] = line = []
@@ -49,8 +52,6 @@ class Parser:
                 match self.tok:
                     case Token("eol", _):
                         self.eat()
-                        while line and not line[-1]:
-                            line.pop()
                         break
 
                     case Token("colon", _):
@@ -88,8 +89,7 @@ class Parser:
                         line.append(("print", *items))
 
                     case _:
-                        line.append(self.tok)
-                        self.eat()
+                        self.error()
 
         return Program(lines)
 

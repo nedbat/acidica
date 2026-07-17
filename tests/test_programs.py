@@ -120,6 +120,42 @@ def program(
             "",
             error="!Syntax error on line 17: 'LET'",
         ),
+        program(
+            "PRINT 10",
+            "",
+            error="!No line number: 'PRINT'",
+        ),
+        program(
+            """
+            10 PRINT 10
+            10 PRINT 20
+            """,
+            "",
+            error="!Duplicate line number 10",
+        ),
+        program(
+            "999 GO TO PRINT",
+            "",
+            error="!Syntax error on line 999: 'PRINT'",
+        ),
+        program(
+            "999 GO 123",
+            "",
+            error="!Syntax error on line 999: '123'",
+        ),
+        program(
+            "9999 1234",
+            "",
+            error="!Syntax error on line 9999: '1234'",
+        ),
+        program(
+            """
+            100 print "hello"
+            101 print 1/0
+            """,
+            "hello\n",
+            error="!Division by zero on line 101",
+        ),
     ],
 )
 def test_program(source, output, error):

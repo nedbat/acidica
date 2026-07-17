@@ -1,3 +1,6 @@
+from .exceptions import AcidicaError
+
+
 class Interpreter:
     def run(self, program, instream, outstream):
         self.instream = instream
@@ -20,6 +23,10 @@ class Interpreter:
                 self.cur_line = program.nexts.get(self.cur_line)
                 if self.cur_line is None:
                     break
+
+    def error(self, msg: str) -> Never:
+        msg += f" on line {self.cur_line}"
+        raise AcidicaError(msg)
 
     def exec(self, node):
         match node:
@@ -56,7 +63,11 @@ class Interpreter:
             case ("*", e1, e2):
                 return self.eval(e1) * self.eval(e2)
             case ("/", e1, e2):
-                return self.eval(e1) / self.eval(e2)
+                v1 = self.eval(e1)
+                v2 = self.eval(e2)
+                if v2 == 0:
+                    self.error("Division by zero")
+                return v1 / v2
 
     def print(self, value):
         if isinstance(value, str):
