@@ -40,23 +40,21 @@ FUNCTIONS = "|".join(
 OPWORDS = "|".join("NOT AND OR".split())
 
 TOKENS = rf"""(?xmi)
-    (?:
-        (REM.*$)                                            |
-        (?P<lparen>\()                                      |
-        (?P<rparen>\))                                      |
-        (?P<comma>,)                                        |
-        (?P<colon>:)                                        |
-        (?P<semicolon>;)                                    |
-        (?P<key>{KEYWORDS}|\?)                              |
-        (?P<fn>{FUNCTIONS})                                 |
-        (?P<var>[A-Z]+[0-9]*[$%]?)                          |
-        (?P<num>[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)          |
-        (?P<str>"[^"]*")                                    |
-        (?P<op>-|\+|\^|\*|/|=|<>|<=|>=|<|>|{OPWORDS})       |
-        (?P<eol>$)                                          |
-        [ ]                                                 |
-        (?P<err>.)
-    )
+    (REM.*$)                                            |
+    (?P<lparen>\()                                      |
+    (?P<rparen>\))                                      |
+    (?P<comma>,)                                        |
+    (?P<colon>:)                                        |
+    (?P<semicolon>;)                                    |
+    (?P<key>{KEYWORDS}|\?)                              |
+    (?P<fn>{FUNCTIONS})                                 |
+    (?P<var>[A-Z]+[0-9]*[$%]?)                          |
+    (?P<num>[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)          |
+    (?P<str>"[^"]*")                                    |
+    (?P<op>-|\+|\^|\*|/|=|<>|<=|>=|<|>|{OPWORDS})       |
+    (?P<eol>$)                                          |
+    [ ]                                                 |
+    (?P<err>.)
     """
 
 
