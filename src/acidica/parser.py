@@ -91,6 +91,25 @@ class Parser:
                             case _:
                                 self.error()
 
+                    case Token("key", "INPUT"):
+                        self.eat()
+                        if self.tok.kind == "str":
+                            msg = self.tok.value()
+                            self.eat()
+                            self.eat("semicolon")
+                        else:
+                            msg = ""
+                        vars = []
+                        while True:
+                            if self.tok.kind != "var":
+                                self.error()
+                            vars.append(self.tok.text)
+                            self.eat()
+                            if self.tok.kind != "comma":
+                                break
+                            self.eat()
+                        line.append(("input", msg, *vars))
+
                     case Token("key", "LET"):
                         self.eat()
                         match self.tok:

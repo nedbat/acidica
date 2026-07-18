@@ -1,5 +1,6 @@
 import dataclasses
 import math
+import re
 from typing import Never
 
 from .exceptions import AcidicaError
@@ -86,6 +87,36 @@ class Interpreter:
             case ("goto", line_num):
                 self.cur_line = line_num
                 self.cur_subline = -1  # the main loop will increment it
+
+            case ("input", msg, *vars):
+                VAL_TOKENS = r'(\s*"[^"]*")|(\s*[^",][^,]+)'
+                print(f"{msg}? ", end="", file=self.outstream, flush=True)
+                while True:
+                    vals = []
+                    while True:
+                        line = self.instream.readline()
+                        if not self.instream.isatty():
+                            print(file=self.outstream)
+                        vals.extend(
+                            v.group(0).strip().strip('"')
+                            for v in re.finditer(VAL_TOKENS, line)
+                        )
+                        if len(vals) < len(vars):
+                            print("?? ", end="", file=self.outstream, flush=True)
+                        else:
+                            break
+                    if len(vals) > len(vars):
+                        print("!Extra input ignored", file=self.outstream)
+                    for var, val in zip(vars, vals):
+                        try:
+                            val = var_type(var)(val)
+                        except ValueError:
+                            print("!Number expected - retry input line", file=self.outstream)
+                            print("? ", end="", file=self.outstream, flush=True)
+                            break
+                        self.set_var(var, val)
+                    else:
+                        break
 
             case ("let", var, expr):
                 self.set_var(var, self.eval(expr))

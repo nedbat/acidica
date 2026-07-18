@@ -27,9 +27,10 @@ def program(
     source: str,
     output: str = "",
     *,
+    input: str = "",
     error: str | None = None,
 ) -> tuple[str, str, str | None]:
-    return (easy_text(source), easy_text(output), error)
+    return (easy_text(source), easy_text(output), easy_text(input), error)
 
 
 TEST_PROGRAMS = [
@@ -315,19 +316,83 @@ TEST_PROGRAMS = [
         "10 for x$ = 1 to 10",
         error="!Incorrect type: can't assign 1 to X$ on line 10",
     ),
-
+    # Input
+    program(
+        """
+        10 INPUT "What"; x$, y%, z
+        20 PRINT x$, y%, z
+        """,
+        """What? \nHello there    12            3.14159 \n""",
+        input="""
+        "Hello there",  12, 3.14159
+        """,
+    ),
+    program(
+        """
+        10 INPUT "What"; x$, y%, z
+        20 PRINT x$, y%, z
+        """,
+        """What? \n?? \nHello          12            3.14159 \n""",
+        input="""
+        Hello
+        12, 3.14159
+        """,
+    ),
+    program(
+        """
+        10 INPUT "What"; x$, y%, z
+        20 PRINT x$, y%, z
+        """,
+        """What? \n!Extra input ignored\nHello          12            3.14159 \n""",
+        input="""
+        Hello, 12, 3.14159, 1, 2, 3, 4
+        """,
+    ),
+    program(
+        """
+        10 INPUT "What"; x$, y%, z
+        20 PRINT x$, y%, z
+        """,
+        """What? \n!Number expected - retry input line\n? \nGoodbye        34            2.71828 \n""",
+        input="""
+        Hello, 12.234, 3.14159
+        Goodbye, 34, 2.71828
+        """,
+    ),
+    # Input errors
+    program(
+        "10 INPUT",
+        error="!Syntax error on line 10",
+    ),
+    program(
+        '10 INPUT "What"',
+        error="!Expected semicolon, saw eol on line 10",
+    ),
+    program(
+        '10 INPUT "What";',
+        error="!Syntax error on line 10",
+    ),
+    program(
+        '10 INPUT "What";x,',
+        error="!Syntax error on line 10",
+    ),
+    program(
+        '10 INPUT "What";x 12.34',
+        error="!Syntax error on line 10: '12.34'",
+    ),
 ]
 
 
 @pytest.mark.parametrize(
-    "source, output, error",
+    "source, output, input, error",
     TEST_PROGRAMS,
 )
-def test_program(source, output, error):
+def test_program(source, output, input, error):
     outstream = io.StringIO()
+    instream = io.StringIO(input)
     try:
         prog = Parser(source).parse()
-        Interpreter().run(prog, instream=None, outstream=outstream)
+        Interpreter().run(prog, instream=instream, outstream=outstream)
     except AcidicaError as e:
         assert str(e) == error
     else:
