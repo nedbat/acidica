@@ -91,6 +91,13 @@ TEST_PROGRAMS = [
         """,
         "hithere\n 1  2  3 X\n",
     ),
+    # No separator is the same as a semicolon
+    program(
+        """
+        6 PRINT "Z" 1 "A" 3 "X"
+        """,
+        "Z 1 A 3 X\n",
+    ),
     # Commas jump to the next 14-space zone
     program(
         """
