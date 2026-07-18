@@ -25,7 +25,7 @@ def easy_text(text: str) -> str:
 
 def program(
     source: str,
-    output: str,
+    output: str = "",
     *,
     error: str | None = None,
 ) -> tuple[str, str, str | None]:
@@ -115,12 +115,10 @@ TEST_PROGRAMS = [
     # Error handling
     program(
         "17 PRINT LET",
-        "",
         error="!Syntax error on line 17: 'LET'",
     ),
     program(
         "PRINT 10",
-        "",
         error="!No line number: 'PRINT'",
     ),
     program(
@@ -128,22 +126,18 @@ TEST_PROGRAMS = [
         10 PRINT 10
         10 PRINT 20
         """,
-        "",
         error="!Duplicate line number 10",
     ),
     program(
         "999 GO TO PRINT",
-        "",
         error="!Syntax error on line 999: 'PRINT'",
     ),
     program(
         "999 GO 123",
-        "",
         error="!Syntax error on line 999: '123'",
     ),
     program(
         "9999 1234",
-        "",
         error="!Syntax error on line 9999: '1234'",
     ),
     program(
@@ -156,7 +150,6 @@ TEST_PROGRAMS = [
     ),
     program(
         "10 PRINT (X+",
-        "",
         error="!Expected rparen, saw eol on line 10",
     ),
     # Variables
@@ -169,12 +162,10 @@ TEST_PROGRAMS = [
     ),
     program(
         "10 LET 12 = 10 + 2",
-        "",
         error="!Syntax error on line 10: '12'",
     ),
     program(
         "10 LET X 24",
-        "",
         error="!Syntax error on line 10: '24'",
     ),
     program(
@@ -194,17 +185,14 @@ TEST_PROGRAMS = [
     ),
     program(
         '10 LET X = "hello"',
-        "",
         error="!Incorrect type: can't assign 'hello' to X on line 10",
     ),
     program(
         '10 LET X% = "hello"',
-        "",
         error="!Incorrect type: can't assign 'hello' to X% on line 10",
     ),
     program(
         "10 LET X$ = 12",
-        "",
         error="!Incorrect type: can't assign 12 to X$ on line 10",
     ),
     # LET is implicit, and ? is the same as PRINT
@@ -262,29 +250,24 @@ TEST_PROGRAMS = [
     # Loop errors
     program(
         "10 for 12",
-        "",
         error="!Syntax error on line 10: '12'",
     ),
     program(
         "10 for i 1 10",
-        "",
         error="!Syntax error on line 10: '1'",
     ),
     program(
         "10 for i = 1 10",
-        "",
         error="!Syntax error on line 10: '10'",
     ),
     program(
         "10 for i = 1 to 10 Step LET",
-        "",
         error="!Syntax error on line 10: 'LET'",
     ),
     program(
         """
         10 next 3.14159
         """,
-        "",
         error="!Syntax error on line 10: '3.14159'",
     ),
     # Named NEXT
@@ -303,7 +286,6 @@ TEST_PROGRAMS = [
         """
         10 next i
         """,
-        "",
         error="!No matching loop found on line 10",
     ),
     program(
@@ -311,7 +293,6 @@ TEST_PROGRAMS = [
         10 for i = 1 to 10
         20 next j
         """,
-        "",
         error="!No matching loop found on line 20",
     ),
 ]
