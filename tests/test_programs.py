@@ -184,6 +184,12 @@ TEST_PROGRAMS = [
         "PI = 3.1416 ; PI$ = pi; PI% = 3 \n",
     ),
     program(
+        """
+        10 PI% = 3.14159: LOW% = 0-3.14159: PRINT "Nums:";PI%;LOW%
+        """,
+        "Nums: 3 -4 \n",
+    ),
+    program(
         '10 LET X = "hello"',
         error="!Incorrect type: can't assign 'hello' to X on line 10",
     ),
@@ -246,6 +252,16 @@ TEST_PROGRAMS = [
          1  2  3  4 .
          1  2  3  4  5 .
         """,
+    ),
+    program(
+        """
+        10 print "Look:";
+        20 for i% = 1.1 to 5.5 step 1.1
+        30 print i%;
+        40 next i%
+        50 print "."
+        """,
+        "Look: 1  2  3  4  5 .\n",
     ),
     # Loop errors
     program(

@@ -1,16 +1,17 @@
 import dataclasses
+import math
 from typing import Never
 
 from .exceptions import AcidicaError
 
 
-def types(var: str):
+def var_type(var: str):
     if var.endswith("%"):
-        return (int,)
+        return int
     elif var.endswith("$"):
-        return (str,)
+        return str
     else:
-        return (int, float)
+        return float
 
 
 @dataclasses.dataclass
@@ -54,12 +55,16 @@ class Interpreter:
     def get_var(self, var):
         value = self.variables.get(var)
         if value is None:
-            value = types(var)[0]()
+            value = var_type(var)()
         return value
 
     def set_var(self, var, val):
-        ok_types = types(var)
-        if not isinstance(val, ok_types):
+        vtype = var_type(var)
+        if vtype is int and isinstance(val, float):
+            val = int(math.floor(val))
+        elif vtype is float and isinstance(val, int):
+            val = float(val)
+        elif not isinstance(val, vtype):
             self.error(f"Incorrect type: can't assign {val!r} to {var}")
         self.variables[var] = val
 
