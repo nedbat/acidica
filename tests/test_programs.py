@@ -295,6 +295,11 @@ TEST_PROGRAMS = [
         """,
         error="!No matching loop found on line 20",
     ),
+    program(
+        "10 for x$ = 1 to 10",
+        error="!Incorrect type: can't assign 1 to X$ on line 10",
+    ),
+
 ]
 
 

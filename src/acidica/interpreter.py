@@ -51,6 +51,18 @@ class Interpreter:
         msg += f" on line {self.cur_line}"
         raise AcidicaError(msg)
 
+    def get_var(self, var):
+        value = self.variables.get(var)
+        if value is None:
+            value = types(var)[0]()
+        return value
+
+    def set_var(self, var, val):
+        ok_types = types(var)
+        if not isinstance(val, ok_types):
+            self.error(f"Incorrect type: can't assign {val!r} to {var}")
+        self.variables[var] = val
+
     def exec(self, node):
         match node:
             case ("for", var, start, end, step):
@@ -64,18 +76,14 @@ class Interpreter:
                     end=self.eval(end),
                 )
                 self.loops.append(loop)
-                self.variables[var] = val
+                self.set_var(var, val)
 
             case ("goto", line_num):
                 self.cur_line = line_num
                 self.cur_subline = -1  # the main loop will increment it
 
             case ("let", var, expr):
-                val = self.eval(expr)
-                ok_types = types(var)
-                if not isinstance(val, ok_types):
-                    self.error(f"Incorrect type: can't assign {val!r} to {var}")
-                self.variables[var] = val
+                self.set_var(var, self.eval(expr))
 
             case ("next", var):
                 if var is not None:
@@ -90,7 +98,7 @@ class Interpreter:
                 else:
                     more = loop.val >= loop.end
                 if more:
-                    self.variables[loop.var] = loop.val
+                    self.set_var(loop.var, loop.val)
                     self.cur_line = loop.line
                     self.cur_subline = loop.subline
                 else:
@@ -123,10 +131,7 @@ class Interpreter:
             case ("value", value):
                 return value
             case ("var", var):
-                value = self.variables.get(var)
-                if value is None:
-                    value = types(var)[0]()
-                return value
+                return self.get_var(var)
             case ("+", e1, e2):
                 return self.eval(e1) + self.eval(e2)
             case ("-", e1, e2):
