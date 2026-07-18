@@ -111,7 +111,10 @@ class Interpreter:
                         try:
                             val = var_type(var)(val)
                         except ValueError:
-                            print("!Number expected - retry input line", file=self.outstream)
+                            print(
+                                "!Number expected - retry input line",
+                                file=self.outstream,
+                            )
                             print("? ", end="", file=self.outstream, flush=True)
                             break
                         self.set_var(var, val)
