@@ -320,7 +320,7 @@ TEST_PROGRAMS = [
     ),
     program(
         "10 for i = 1 10",
-        error="!Syntax error on line 10: '10'",
+        error="!Expected TO, saw 10 on line 10: '10'",
     ),
     program(
         "10 for i = 1 to 10 Step LET",
@@ -593,6 +593,32 @@ TEST_PROGRAMS = [
         """,
         error="!Type mismatch for VAL on line 10",
     ),
+    # If
+    program(
+        """
+        10 if 1 = 1 then print "equal": print "nice"
+        20 print "done part 1"
+        30 if 1 <> 1 then print "wrong!"
+        40 print "done part 2"
+        50 if 1 = 1 then 70
+        60 print "weird"
+        70 print "done part 3"
+        """,
+        """
+        equal
+        nice
+        done part 1
+        done part 2
+        done part 3
+        """
+    ),
+    program(
+        """
+        10 if chr$(72) then print "What!?"
+        """,
+        error="!Type mismatch for IF on line 10",
+    ),
+    # Vintage-basic examples
     program(
         "./tests/examples/diamond.bas",
         "./tests/examples/diamond.out",
@@ -611,6 +637,11 @@ TEST_PROGRAMS = [
         "./tests/examples/strings.bas",
         "./tests/examples/strings.out",
         input="./tests/examples/strings.in",
+    ),
+    program(
+        "./tests/examples/stars.bas",
+        "./tests/examples/stars.out",
+        input="./tests/examples/stars.in",
     ),
 ]
 

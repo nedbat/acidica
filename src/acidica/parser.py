@@ -24,6 +24,12 @@ class Parser:
         else:
             self.error(f"Expected {kind}, saw {self.tok.kind}")
 
+    def eat_key(self, text):
+        if self.tok.kind == "key" and self.tok.text == text:
+            self.tok = next(self.toks)
+        else:
+            self.error(f"Expected {text}, saw {self.tok.text}")
+
     def parse(self) -> Program:
         lines = {}
         while True:
@@ -56,6 +62,19 @@ class Parser:
                     case Token("colon", _):
                         self.eat()
 
+                    case Token("key", "END"):
+                        self.eat()
+                        line.append(("end",))
+
+                    case Token("key", "IF"):
+                        self.eat()
+                        cond = self.expr()
+                        self.eat_key("THEN")
+                        line.append(("if", cond))
+                        if self.tok.kind == "num":
+                            line.append(("goto", self.tok.value()))
+                            self.eat()
+
                     case Token("key", "FOR"):
                         self.eat()
                         if self.tok.kind != "var":
@@ -66,9 +85,7 @@ class Parser:
                             self.error()
                         self.eat()
                         start = self.expr()
-                        if self.tok != Token("key", "TO"):
-                            self.error()
-                        self.eat()
+                        self.eat_key("TO")
                         end = self.expr()
                         if self.tok == Token("key", "STEP"):
                             self.eat()

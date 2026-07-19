@@ -50,6 +50,7 @@ class Interpreter:
     def __init__(self, program, instream, outstream):
         self.program = program
         self.io = InOut(outstream, instream)
+        self.running = True
         self.cur_line = self.program.first
         self.cur_subline = 0
         self.variables = {}
@@ -58,17 +59,19 @@ class Interpreter:
         self.last_rnd = 0
 
     def run(self):
-        while True:
+        while self.running:
             line = self.program.lines[self.cur_line]
             if self.cur_subline >= len(line):
-                self.cur_line = self.program.nexts.get(self.cur_line)
-                if self.cur_line is None:
-                    break
-                self.cur_subline = 0
-                continue
-
-            self.exec(self.program.lines[self.cur_line][self.cur_subline])
+                self.next_line()
+            else:
+                self.exec(self.program.lines[self.cur_line][self.cur_subline])
             self.cur_subline += 1
+
+    def next_line(self):
+        self.cur_subline = -1
+        self.cur_line = self.program.nexts.get(self.cur_line)
+        if self.cur_line is None:
+            self.running = False
 
     def error(self, msg: str) -> Never:
         msg += f" on line {self.cur_line}"
@@ -92,6 +95,16 @@ class Interpreter:
 
     def exec(self, node):
         match node:
+            case ("end",):
+                self.running = False
+
+            case ("if", cond):
+                cond = self.eval(cond)
+                if isinstance(cond, str):
+                    self.error(f"Type mismatch for IF")
+                if not cond:
+                    self.next_line()
+
             case ("for", var, start, end, step):
                 val = self.eval(start)
                 loop = Loop(
