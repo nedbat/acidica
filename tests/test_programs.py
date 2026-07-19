@@ -451,6 +451,10 @@ TEST_PROGRAMS = [
         120 print "mid$ "; mid$("Abcdef", 3); "x"; mid$("Abcdef", 3, 2); "x"; mid$("Abcdef", 3, 0); "."
         130 print "right$ "; right$("Abcdef", 3); "x"; right$("Abcdef", 999); "x"; right$("Abcdef", 0); "."
         140 print "right$ "; right$("Abcdef", 3.14); "."
+        150 print "sgn"; sgn(10.5); sgn(0); sgn(-10.5); "."
+        160 print "sin "; sin(10.5); "."
+        170 print "spc "; "x"; spc(10); "x"; spc(0); "x"; spc(2.3); "."
+        180 print "sqr"; sqr(10.5); "."
         """,
         """
         abs 10.1  10.1  10 .
@@ -467,6 +471,10 @@ TEST_PROGRAMS = [
         mid$ cdefxcdx.
         right$ defxAbcdefx.
         right$ def.
+        sgn 1  0 -1 .
+        sin -0.87969576 .
+        spc x          xx  .
+        sqr 3.2403703 .
         """,
     ),
     program(
@@ -540,6 +548,18 @@ TEST_PROGRAMS = [
         10 print right$("Hello", -1)
         """,
         error="!Invalid argument for RIGHT$ on line 10",
+    ),
+    program(
+        """
+        10 print spc(-1)
+        """,
+        error="!Invalid argument for SPC on line 10",
+    ),
+    program(
+        """
+        10 print sqr(-1)
+        """,
+        error="!Invalid argument for SQR on line 10",
     ),
 ]
 

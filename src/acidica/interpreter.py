@@ -265,7 +265,7 @@ class Interpreter:
                         self.error("Wrong number of arguments for MID$")
                     if start < 1:
                         self.error("Invalid argument for MID$")
-                    s = s[start - 1:]
+                    s = s[start - 1 :]
                     if num is not None:
                         if num < 0:
                             self.error("Invalid argument for MID$")
@@ -279,6 +279,30 @@ class Interpreter:
                     if num == 0:
                         return ""
                     return args[0][-num:]
+                case "SGN":
+                    self.expects(1, fn, args)
+                    if args[0] < 0:
+                        return -1
+                    elif args[0] > 0:
+                        return 1
+                    else:
+                        return 0
+                case "SIN":
+                    self.expects(1, fn, args)
+                    return math.sin(args[0])
+                case "SPC":
+                    self.expects(1, fn, args)
+                    num = float2int(args[0])
+                    if num < 0:
+                        self.error("Invalid argument for SPC")
+                    return " " * num
+                case "SQR":
+                    self.expects(1, fn, args)
+                    num = args[0]
+                    if num < 0:
+                        self.error("Invalid argument for SQR")
+                    return math.sqrt(num)
+
                 case NEVER:
                     self.error(f"Unimplemented function: {fn}")
         except TypeError:
