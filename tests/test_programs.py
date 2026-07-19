@@ -610,7 +610,7 @@ TEST_PROGRAMS = [
         done part 1
         done part 2
         done part 3
-        """
+        """,
     ),
     program(
         """

@@ -353,7 +353,9 @@ class Interpreter:
                 case "VAL":
                     self.expects(1, fn, args)
                     try:
-                        return float(args[0] + "")  # trick to force typeerror for floats
+                        return float(
+                            args[0] + ""
+                        )  # trick to force typeerror for floats
                     except ValueError:
                         return 0
 
