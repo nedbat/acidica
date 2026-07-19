@@ -188,8 +188,20 @@ class Interpreter:
                 return v1 / v2
             case ("^", e1, e2):
                 return self.eval(e1) ** self.eval(e2)
-            case ("unary-", e1):
+            case ("negate", e1):
                 return -self.eval(e1)
+            case ("=", e1, e2):
+                return -1 if self.eval(e1) == self.eval(e2) else 0
+            case ("<>", e1, e2):
+                return -1 if self.eval(e1) != self.eval(e2) else 0
+            case ("<", e1, e2):
+                return -1 if self.eval(e1) < self.eval(e2) else 0
+            case ("<=", e1, e2):
+                return -1 if self.eval(e1) <= self.eval(e2) else 0
+            case (">", e1, e2):
+                return -1 if self.eval(e1) > self.eval(e2) else 0
+            case (">=", e1, e2):
+                return -1 if self.eval(e1) >= self.eval(e2) else 0
             case NEVER:
                 self.error(f"Unimplemented: {expr}")
 

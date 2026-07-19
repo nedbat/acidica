@@ -179,7 +179,7 @@ class Parser:
         match self.tok:
             case Token("op", "-"):
                 self.eat()
-                return ("unary-", self.prec9())
+                return ("negate", self.prec9())
             case Token("op", "+"):
                 self.eat()
                 return self.prec9()
@@ -215,4 +215,12 @@ class Parser:
             node = (op, node, self.prec6())
         return node
 
-    expr = prec5
+    def prec4(self):
+        node = self.prec5()
+        while self.tok.kind == "op" and self.tok.text in {"=", "<>", "<", "<=", ">", ">="}:
+            op = self.tok.text
+            self.eat()
+            node = (op, node, self.prec5())
+        return node
+
+    expr = prec4
