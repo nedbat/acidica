@@ -73,14 +73,19 @@ TEST_PROGRAMS = [
     # Arithmetic
     program(
         """
-        1 PRINT "look:"
-        2 PRINT (3*(1+2) - 1) / 2
-        3 PRINT 6-10
-        4 PRINT (3*(1+2) - 1) / 3
-        5 PRINT -1; +3.14
-        99 PRINT "bye"
+        2 PRINT "simple"; (3*(1+2) - 1) / 2; "."
+        3 PRINT "negative "; 6-10; "."
+        4 PRINT "float"; (3*(1+2) - 1) / 3; "."
+        5 PRINT "unary "; -1; +3.14; "."
+        6 print "exp"; 2^3^2; (2^3)^2; 2^(3^2); "."
         """,
-        "look:\n 4 \n-4 \n 2.6666667 \n-1  3.14 \nbye\n",
+        """
+        simple 4 .
+        negative -4 .
+        float 2.6666667 .
+        unary -1  3.14 .
+        exp 512  64  512 .
+        """,
     ),
     # Semicolons control spacing
     program(

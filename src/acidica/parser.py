@@ -185,12 +185,26 @@ class Parser:
                 return self.prec9()
         return self.prec9()
 
-    def prec6(self):
+    def prec7(self):
+        # ^ associates to the right
         node = self.prec8()
+        more = [node]
+        while self.tok.kind == "op" and self.tok.text == "^":
+            self.eat()
+            more.append(self.prec8())
+        while len(more) >= 2:
+            e2 = more.pop()
+            e1 = more.pop()
+            node = ("^", e1, e2)
+            more.append(node)
+        return more[0]
+
+    def prec6(self):
+        node = self.prec7()
         while self.tok.kind == "op" and self.tok.text in {"*", "/"}:
             op = self.tok.text
             self.eat()
-            node = (op, node, self.prec8())
+            node = (op, node, self.prec7())
         return node
 
     def prec5(self):
