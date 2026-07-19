@@ -1,0 +1,12 @@
+ENTER A STRING? 
+ENTER A NUMBER? 
+ASC(A$)= 70 
+CHR$(N)=-
+LEFT$(A$,N)=Four score and seven years ago our fathers br
+MID$(A$,N)=rought forth on this continent a new nation
+MID$(A$,N,3)=rou
+RIGHT$(A$,N)= brought forth on this continent a new nation
+LEN(A$)= 87 
+VAL(A$)= 0 
+STR$(N)= 45
+SPC(N)='                                             '

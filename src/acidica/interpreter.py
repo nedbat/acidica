@@ -249,7 +249,7 @@ class Interpreter:
                     return math.atan(args[0])
                 case "CHR$":
                     self.expects(1, fn, args)
-                    return chr(args[0])
+                    return chr(float2int(args[0]))
                 case "COS":
                     self.expects(1, fn, args)
                     return math.cos(args[0])
@@ -274,11 +274,13 @@ class Interpreter:
                 case "MID$":
                     if len(args) == 3:
                         s, start, num = args
+                        num = float2int(num)
                     elif len(args) == 2:
                         s, start = args
                         num = None
                     else:
                         self.error("Wrong number of arguments for MID$")
+                    start = float2int(start)
                     if start < 1:
                         self.error("Invalid argument for MID$")
                     s = s[start - 1 :]

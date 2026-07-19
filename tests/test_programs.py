@@ -440,7 +440,7 @@ TEST_PROGRAMS = [
         10 print "abs"; abs(10.1); abs(-10.1); abs(10); "."
         20 print "asc"; asc("Hello"); "."
         30 print "atn"; atn(10.5); "."
-        40 print "chr$ "; chr$(72); "."
+        40 print "chr$ "; chr$(72); chr$(73.4); "."
         50 print "cos "; cos(10.5); "."
         60 print "exp"; exp(10.5); "."
         70 print "int"; int(10); int(10.4); int(-10.4); "."
@@ -464,7 +464,7 @@ TEST_PROGRAMS = [
         abs 10.1  10.1  10 .
         asc 72 .
         atn 1.4758446 .
-        chr$ H.
+        chr$ HI.
         cos -0.47553693 .
         exp 36315.503 .
         int 10  10 -11 .
@@ -601,6 +601,16 @@ TEST_PROGRAMS = [
         "./tests/examples/name.bas",
         "./tests/examples/ned.out",
         input="./tests/examples/ned.in",
+    ),
+    program(
+        "./tests/examples/math.bas",
+        "./tests/examples/math.out",
+        input="./tests/examples/math.in",
+    ),
+    program(
+        "./tests/examples/strings.bas",
+        "./tests/examples/strings.out",
+        input="./tests/examples/strings.in",
     ),
 ]
 
