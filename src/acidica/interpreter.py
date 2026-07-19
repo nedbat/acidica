@@ -98,13 +98,6 @@ class Interpreter:
             case ("end",):
                 self.running = False
 
-            case ("if", cond):
-                cond = self.eval(cond)
-                if isinstance(cond, str):
-                    self.error(f"Type mismatch for IF")
-                if not cond:
-                    self.next_line()
-
             case ("for", var, start, end, step):
                 val = self.eval(start)
                 loop = Loop(
@@ -121,6 +114,13 @@ class Interpreter:
             case ("goto", line_num):
                 self.cur_line = line_num
                 self.cur_subline = -1  # the main loop will increment it
+
+            case ("if", cond):
+                cond = self.eval(cond)
+                if isinstance(cond, str):
+                    self.error(f"Type mismatch for IF")
+                if not cond:
+                    self.next_line()
 
             case ("input", msg, *vars):
                 VAL_TOKENS = r'(\s*"[^"]*")|(\s*[^",][^,]+)'

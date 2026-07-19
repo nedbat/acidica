@@ -66,15 +66,6 @@ class Parser:
                         self.eat()
                         line.append(("end",))
 
-                    case Token("key", "IF"):
-                        self.eat()
-                        cond = self.expr()
-                        self.eat_key("THEN")
-                        line.append(("if", cond))
-                        if self.tok.kind == "num":
-                            line.append(("goto", self.tok.value()))
-                            self.eat()
-
                     case Token("key", "FOR"):
                         self.eat()
                         if self.tok.kind != "var":
@@ -107,6 +98,15 @@ class Parser:
                                 self.eat()
                             case _:
                                 self.error()
+
+                    case Token("key", "IF"):
+                        self.eat()
+                        cond = self.expr()
+                        self.eat_key("THEN")
+                        line.append(("if", cond))
+                        if self.tok.kind == "num":
+                            line.append(("goto", self.tok.value()))
+                            self.eat()
 
                     case Token("key", "INPUT"):
                         self.eat()
