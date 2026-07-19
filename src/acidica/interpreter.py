@@ -69,6 +69,12 @@ class Interpreter:
             self.error(f"Incorrect type: can't assign {val!r} to {var}")
         self.variables[var] = val
 
+    def print(self, text="", end="\n", flush=False):
+        print(text, end=end, flush=flush, file=self.outstream)
+
+    def prompt(self, text):
+        self.print(text, end="", flush=True)
+
     def exec(self, node):
         match node:
             case ("for", var, start, end, step):
@@ -90,32 +96,29 @@ class Interpreter:
 
             case ("input", msg, *vars):
                 VAL_TOKENS = r'(\s*"[^"]*")|(\s*[^",][^,]+)'
-                print(f"{msg}? ", end="", file=self.outstream, flush=True)
+                self.prompt(f"{msg}? ")
                 while True:
                     vals = []
                     while True:
                         line = self.instream.readline()
                         if not self.instream.isatty():
-                            print(file=self.outstream)
+                            self.print()
                         vals.extend(
                             v.group(0).strip().strip('"')
                             for v in re.finditer(VAL_TOKENS, line)
                         )
                         if len(vals) < len(vars):
-                            print("?? ", end="", file=self.outstream, flush=True)
+                            self.prompt("?? ")
                         else:
                             break
                     if len(vals) > len(vars):
-                        print("!Extra input ignored", file=self.outstream)
+                        self.print("!Extra input ignored")
                     for var, val in zip(vars, vals):
                         try:
                             val = var_type(var)(val)
                         except ValueError:
-                            print(
-                                "!Number expected - retry input line",
-                                file=self.outstream,
-                            )
-                            print("? ", end="", file=self.outstream, flush=True)
+                            self.print("!Number expected - retry input line")
+                            self.prompt("? ")
                             break
                         self.set_var(var, val)
                     else:
@@ -155,10 +158,10 @@ class Interpreter:
                         case ("semicolon",):
                             newline = False
                         case _:
-                            self.print(self.eval(expr))
+                            self.print_value(self.eval(expr))
                             newline = True
                 if newline:
-                    print(file=self.outstream)
+                    self.print()
                     self.cur_col = 0
                     self.next_col = 0
 
@@ -186,7 +189,7 @@ class Interpreter:
             case NEVER:
                 self.error(f"Unimplemented: {expr}")
 
-    def print(self, value):
+    def print_value(self, value):
         if isinstance(value, str):
             out = value
         else:
@@ -198,5 +201,5 @@ class Interpreter:
             out += " "
 
         nspaces = self.next_col - self.cur_col
-        print(" " * nspaces + out, end="", file=self.outstream)
+        self.print(" " * nspaces + out, end="")
         self.cur_col += nspaces + len(out)
