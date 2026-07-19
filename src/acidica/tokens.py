@@ -33,7 +33,7 @@ KEYWORDS = "|".join(
 FUNCTIONS = "|".join(
     r"""
     ABS ASC ATN CHR\$ COS EXP INT LEFT\$ LEN LOG MID\$ RIGHT\$ RND SGN SIN SPC
-    SQR STR TAB TAN VAL
+    SQR STR\$ TAB TAN VAL
     """.split()
 )
 

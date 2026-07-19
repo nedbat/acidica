@@ -326,7 +326,7 @@ class Interpreter:
                     if num < 0:
                         self.error("Invalid argument for SQR")
                     return math.sqrt(num)
-                case "STR":  # not implemented by vintage-basic?
+                case "STR$":
                     self.expects(1, fn, args)
                     return print_repr(args[0])
                 case "TAB":
