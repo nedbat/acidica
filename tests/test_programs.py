@@ -29,7 +29,7 @@ def program(
     *,
     input: str = "",
     error: str | None = None,
-) -> tuple[str, str, str | None]:
+) -> tuple[str, str, str, str | None]:
     return (easy_text(source), easy_text(output), easy_text(input), error)
 
 
