@@ -444,6 +444,10 @@ TEST_PROGRAMS = [
         50 print "cos "; cos(10.5); "."
         60 print "exp"; exp(10.5); "."
         70 print "int"; int(10); int(10.4); int(-10.4); "."
+        80 print "left$ "; left$("Hello", 3); "x"; left$("Hello", 99); "x"; left$("Hello", 0); "."
+        90 print "left$ "; left$("Hello", 3.14); "."
+        100 print "len"; len("Hello"); len(""); "."
+        110 print "log"; log(10.5); "."
         """,
         """
         abs 10.1  10.1  10 .
@@ -453,6 +457,10 @@ TEST_PROGRAMS = [
         cos -0.47553693 .
         exp 36315.503 .
         int 10  10 -11 .
+        left$ HelxHellox.
+        left$ Hel.
+        len 5  0 .
+        log 2.3513753 .
         """,
     ),
     program(
@@ -478,6 +486,12 @@ TEST_PROGRAMS = [
         10 print asc(10)
         """,
         error="!Type mismatch for ASC on line 10",
+    ),
+    program(
+        """
+        10 print left$("Hello", -1)
+        """,
+        error="!Invalid argument for LEFT$ on line 10",
     ),
 ]
 

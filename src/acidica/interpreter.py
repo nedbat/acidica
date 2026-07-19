@@ -16,8 +16,12 @@ def var_type(var: str):
         return float
 
 
-def bool_float(bval):
+def bool2float(bval):
     return -1 if bval else 0
+
+
+def float2int(fval):
+    return int(math.floor(fval))
 
 
 @dataclasses.dataclass
@@ -66,7 +70,7 @@ class Interpreter:
     def set_var(self, var, val):
         vtype = var_type(var)
         if vtype is int and isinstance(val, float):
-            val = int(math.floor(val))
+            val = float2int(val)
         elif vtype is float and isinstance(val, int):
             val = float(val)
         elif not isinstance(val, vtype):
@@ -184,23 +188,23 @@ class Interpreter:
                 case ("negate", e1):
                     return -self.eval(e1)
                 case ("=", e1, e2):
-                    return bool_float(self.eval(e1) == self.eval(e2))
+                    return bool2float(self.eval(e1) == self.eval(e2))
                 case ("<>", e1, e2):
-                    return bool_float(self.eval(e1) != self.eval(e2))
+                    return bool2float(self.eval(e1) != self.eval(e2))
                 case ("<", e1, e2):
-                    return bool_float(self.eval(e1) < self.eval(e2))
+                    return bool2float(self.eval(e1) < self.eval(e2))
                 case ("<=", e1, e2):
-                    return bool_float(self.eval(e1) <= self.eval(e2))
+                    return bool2float(self.eval(e1) <= self.eval(e2))
                 case (">", e1, e2):
-                    return bool_float(self.eval(e1) > self.eval(e2))
+                    return bool2float(self.eval(e1) > self.eval(e2))
                 case (">=", e1, e2):
-                    return bool_float(self.eval(e1) >= self.eval(e2))
+                    return bool2float(self.eval(e1) >= self.eval(e2))
                 case ("not", e1):
-                    return bool_float(not self.eval(e1))
+                    return bool2float(not self.eval(e1))
                 case ("and", e1, e2):
-                    return bool_float(self.eval(e1) and self.eval(e2))
+                    return bool2float(self.eval(e1) and self.eval(e2))
                 case ("or", e1, e2):
-                    return bool_float(self.eval(e1) or self.eval(e2))
+                    return bool2float(self.eval(e1) or self.eval(e2))
                 case ("fn", fn, *args):
                     args = [self.eval(a) for a in args]
                     return self.function(fn, *args)
@@ -238,7 +242,19 @@ class Interpreter:
                     return math.exp(args[0])
                 case "INT":
                     self.expects(1, fn, args)
-                    return int(math.floor(args[0]))
+                    return float2int(args[0])
+                case "LEFT$":
+                    self.expects(2, fn, args)
+                    num = float2int(args[1])
+                    if num < 0:
+                        self.error("Invalid argument for LEFT$")
+                    return args[0][:num]
+                case "LEN":
+                    self.expects(1, fn, args)
+                    return len(args[0])
+                case "LOG":
+                    self.expects(1, fn, args)
+                    return math.log(args[0])
                 case NEVER:
                     self.error(f"Unimplemented function: {fn}")
         except TypeError:
