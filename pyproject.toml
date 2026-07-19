@@ -22,3 +22,6 @@ exclude_also = [
     # Don't complain about missing default cases that are never meant to happen.
     "case NEVER:",
 ]
+
+[tool.coverage.run]
+source = ["src", "tests"]
