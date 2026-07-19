@@ -255,6 +255,30 @@ class Interpreter:
                 case "LOG":
                     self.expects(1, fn, args)
                     return math.log(args[0])
+                case "MID$":
+                    if len(args) == 3:
+                        s, start, num = args
+                    elif len(args) == 2:
+                        s, start = args
+                        num = None
+                    else:
+                        self.error("Wrong number of arguments for MID$")
+                    if start < 1:
+                        self.error("Invalid argument for MID$")
+                    s = s[start - 1:]
+                    if num is not None:
+                        if num < 0:
+                            self.error("Invalid argument for MID$")
+                        s = s[:num]
+                    return s
+                case "RIGHT$":
+                    self.expects(2, fn, args)
+                    num = float2int(args[1])
+                    if num < 0:
+                        self.error("Invalid argument for RIGHT$")
+                    if num == 0:
+                        return ""
+                    return args[0][-num:]
                 case NEVER:
                     self.error(f"Unimplemented function: {fn}")
         except TypeError:

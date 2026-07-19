@@ -448,6 +448,9 @@ TEST_PROGRAMS = [
         90 print "left$ "; left$("Hello", 3.14); "."
         100 print "len"; len("Hello"); len(""); "."
         110 print "log"; log(10.5); "."
+        120 print "mid$ "; mid$("Abcdef", 3); "x"; mid$("Abcdef", 3, 2); "x"; mid$("Abcdef", 3, 0); "."
+        130 print "right$ "; right$("Abcdef", 3); "x"; right$("Abcdef", 999); "x"; right$("Abcdef", 0); "."
+        140 print "right$ "; right$("Abcdef", 3.14); "."
         """,
         """
         abs 10.1  10.1  10 .
@@ -461,6 +464,9 @@ TEST_PROGRAMS = [
         left$ Hel.
         len 5  0 .
         log 2.3513753 .
+        mid$ cdefxcdx.
+        right$ defxAbcdefx.
+        right$ def.
         """,
     ),
     program(
@@ -492,6 +498,48 @@ TEST_PROGRAMS = [
         10 print left$("Hello", -1)
         """,
         error="!Invalid argument for LEFT$ on line 10",
+    ),
+    program(
+        """
+        10 print mid$("Hello", -1)
+        """,
+        error="!Invalid argument for MID$ on line 10",
+    ),
+    program(
+        """
+        10 print mid$("Hello", 0)
+        """,
+        error="!Invalid argument for MID$ on line 10",
+    ),
+    program(
+        """
+        10 print mid$("Hello", 1, -1)
+        """,
+        error="!Invalid argument for MID$ on line 10",
+    ),
+    program(
+        """
+        10 print mid$("Hello")
+        """,
+        error="!Wrong number of arguments for MID$ on line 10",
+    ),
+    program(
+        """
+        10 print mid$("Hello", 1, 2, 3)
+        """,
+        error="!Wrong number of arguments for MID$ on line 10",
+    ),
+    program(
+        """
+        10 print mid$(123, 1, 2)
+        """,
+        error="!Type mismatch for MID$ on line 10",
+    ),
+    program(
+        """
+        10 print right$("Hello", -1)
+        """,
+        error="!Invalid argument for RIGHT$ on line 10",
     ),
 ]
 
