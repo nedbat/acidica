@@ -593,6 +593,15 @@ TEST_PROGRAMS = [
         """,
         error="!Type mismatch for VAL on line 10",
     ),
+    program(
+        "./tests/examples/diamond.bas",
+        "./tests/examples/diamond.out",
+    ),
+    program(
+        "./tests/examples/name.bas",
+        "./tests/examples/ned.out",
+        input="./tests/examples/ned.in",
+    ),
 ]
 
 
