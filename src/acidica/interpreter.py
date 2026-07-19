@@ -186,6 +186,8 @@ class Interpreter:
                 if v2 == 0:
                     self.error("Division by zero")
                 return v1 / v2
+            case ("unary-", e1):
+                return -self.eval(e1)
             case NEVER:
                 self.error(f"Unimplemented: {expr}")
 

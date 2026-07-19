@@ -77,9 +77,10 @@ TEST_PROGRAMS = [
         2 PRINT (3*(1+2) - 1) / 2
         3 PRINT 6-10
         4 PRINT (3*(1+2) - 1) / 3
-        5 PRINT "bye"
+        5 PRINT -1; +3.14
+        99 PRINT "bye"
         """,
-        "look:\n 4 \n-4 \n 2.6666667 \nbye\n",
+        "look:\n 4 \n-4 \n 2.6666667 \n-1  3.14 \nbye\n",
     ),
     # Semicolons control spacing
     program(
@@ -236,7 +237,7 @@ TEST_PROGRAMS = [
     program(
         """
         10 print "countdown:";
-        20 For I = 5 to 1 step 1-2
+        20 For I = 5 to 1 step -1
         30 print i;
         40 next
         50 print

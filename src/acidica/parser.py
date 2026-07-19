@@ -175,12 +175,22 @@ class Parser:
                 self.eat("rparen")
                 return node
 
+    def prec8(self):
+        match self.tok:
+            case Token("op", "-"):
+                self.eat()
+                return ("unary-", self.prec9())
+            case Token("op", "+"):
+                self.eat()
+                return self.prec9()
+        return self.prec9()
+
     def prec6(self):
-        node = self.prec9()
+        node = self.prec8()
         while self.tok.kind == "op" and self.tok.text in {"*", "/"}:
             op = self.tok.text
             self.eat()
-            node = (op, node, self.prec9())
+            node = (op, node, self.prec8())
         return node
 
     def prec5(self):
