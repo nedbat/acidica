@@ -16,6 +16,10 @@ def var_type(var: str):
         return float
 
 
+def bool_float(bval):
+    return -1 if bval else 0
+
+
 @dataclasses.dataclass
 class Loop:
     var: str
@@ -180,17 +184,23 @@ class Interpreter:
                 case ("negate", e1):
                     return -self.eval(e1)
                 case ("=", e1, e2):
-                    return -1 if self.eval(e1) == self.eval(e2) else 0
+                    return bool_float(self.eval(e1) == self.eval(e2))
                 case ("<>", e1, e2):
-                    return -1 if self.eval(e1) != self.eval(e2) else 0
+                    return bool_float(self.eval(e1) != self.eval(e2))
                 case ("<", e1, e2):
-                    return -1 if self.eval(e1) < self.eval(e2) else 0
+                    return bool_float(self.eval(e1) < self.eval(e2))
                 case ("<=", e1, e2):
-                    return -1 if self.eval(e1) <= self.eval(e2) else 0
+                    return bool_float(self.eval(e1) <= self.eval(e2))
                 case (">", e1, e2):
-                    return -1 if self.eval(e1) > self.eval(e2) else 0
+                    return bool_float(self.eval(e1) > self.eval(e2))
                 case (">=", e1, e2):
-                    return -1 if self.eval(e1) >= self.eval(e2) else 0
+                    return bool_float(self.eval(e1) >= self.eval(e2))
+                case ("not", e1):
+                    return bool_float(not self.eval(e1))
+                case ("and", e1, e2):
+                    return bool_float(self.eval(e1) and self.eval(e2))
+                case ("or", e1, e2):
+                    return bool_float(self.eval(e1) or self.eval(e2))
                 case NEVER:
                     self.error(f"Unimplemented: {expr}")
         except TypeError:

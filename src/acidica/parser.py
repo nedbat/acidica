@@ -183,7 +183,8 @@ class Parser:
             case Token("op", "+"):
                 self.eat()
                 return self.prec9()
-        return self.prec9()
+            case _:
+                return self.prec9()
 
     def prec7(self):
         # ^ associates to the right
@@ -230,4 +231,28 @@ class Parser:
             node = (op, node, self.prec5())
         return node
 
-    expr = prec4
+    def prec3(self):
+        match self.tok:
+            case Token("op", "NOT"):
+                self.eat()
+                return ("not", self.prec4())
+            case _:
+                return self.prec4()
+
+    def prec2(self):
+        node = self.prec3()
+        while self.tok.kind == "op" and self.tok.text == "AND":
+            op = self.tok.text
+            self.eat()
+            node = ("and", node, self.prec3())
+        return node
+
+    def prec1(self):
+        node = self.prec2()
+        while self.tok.kind == "op" and self.tok.text == "OR":
+            op = self.tok.text
+            self.eat()
+            node = ("or", node, self.prec2())
+        return node
+
+    expr = prec1

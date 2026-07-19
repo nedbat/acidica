@@ -87,6 +87,7 @@ TEST_PROGRAMS = [
         exp 512  64  512 .
         """,
     ),
+    # Comparisons
     program(
         """
         1 PRINT "eq "; 0 =  0; 0 =  1; 1 =  0; "X" =  "X"; "X" =  "Y"; "Y" =  "X"; "."
@@ -103,6 +104,19 @@ TEST_PROGRAMS = [
         le -1 -1  0 -1 -1  0 .
         gt  0  0 -1  0  0 -1 .
         ge -1  0 -1 -1  0 -1 .
+        """,
+    ),
+    program(
+        """
+        10 X = 1: Y = 2
+        20 Print "not " NOT X = Y; "."
+        30 Print "and " X = X and X = Y; "."
+        40 Print "or  " X = X or X = Y; "."
+        """,
+        """
+        not -1 .
+        and  0 .
+        or  -1 .
         """,
     ),
     # Semicolons control spacing
