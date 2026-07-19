@@ -23,8 +23,15 @@ class InOut:
             (max(self.cur_col, self.next_col) + ZONE_WIDTH) // ZONE_WIDTH * ZONE_WIDTH
         )
 
+    def tab(self, n):
+        cur = max(self.cur_col, self.next_col)
+        if cur < n:
+            return " " * (n - cur)
+        else:
+            return ""
+
     def print_value(self, svalue):
-        nspaces = self.next_col - self.cur_col
+        nspaces = max(0, self.next_col - self.cur_col)
         self.print(" " * nspaces + svalue, end="")
         self.cur_col += nspaces + len(svalue)
 

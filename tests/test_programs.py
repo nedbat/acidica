@@ -456,6 +456,7 @@ TEST_PROGRAMS = [
         170 print "spc "; "x"; spc(10); "x"; spc(0); "x"; spc(2.3); "."
         180 print "sqr"; sqr(10.5); "."
         190 print "str"; str(10); str(10.543); str(-10.5); "."
+        200 print "tab"; tab(10); "x"; tab(15); "x"; tab(5); "x"
         """,
         """
         abs 10.1  10.1  10 .
@@ -477,6 +478,7 @@ TEST_PROGRAMS = [
         spc x          xx  .
         sqr 3.2403703 .
         str 10 10.543-10.5.
+        tab       x    xx
         """,
     ),
     program(

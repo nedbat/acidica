@@ -319,6 +319,9 @@ class Interpreter:
                 case "STR":  # not implemented by vintage-basic?
                     self.expects(1, fn, args)
                     return print_repr(args[0])
+                case "TAB":
+                    self.expects(1, fn, args)
+                    return self.io.tab(float2int(args[0]))
 
                 case NEVER:
                     self.error(f"Unimplemented function: {fn}")
