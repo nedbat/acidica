@@ -217,7 +217,14 @@ class Parser:
 
     def prec4(self):
         node = self.prec5()
-        while self.tok.kind == "op" and self.tok.text in {"=", "<>", "<", "<=", ">", ">="}:
+        while self.tok.kind == "op" and self.tok.text in {
+            "=",
+            "<>",
+            "<",
+            "<=",
+            ">",
+            ">=",
+        }:
             op = self.tok.text
             self.eat()
             node = (op, node, self.prec5())

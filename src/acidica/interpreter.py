@@ -4,6 +4,7 @@ import re
 from typing import Never
 
 from .exceptions import AcidicaError
+from .inout import InOut
 
 
 def var_type(var: str):
@@ -26,27 +27,26 @@ class Loop:
 
 
 class Interpreter:
-    def run(self, program, instream, outstream):
-        self.instream = instream
-        self.outstream = outstream
+    def __init__(self, program, instream, outstream):
+        self.program = program
+        self.io = InOut(outstream, instream)
 
-        self.cur_line = program.first
+    def run(self):
+        self.cur_line = self.program.first
         self.cur_subline = 0
-        self.cur_col = 0
-        self.next_col = 0
         self.variables = {}
         self.loops = []
 
         while True:
-            line = program.lines[self.cur_line]
+            line = self.program.lines[self.cur_line]
             if self.cur_subline >= len(line):
-                self.cur_line = program.nexts.get(self.cur_line)
+                self.cur_line = self.program.nexts.get(self.cur_line)
                 if self.cur_line is None:
                     break
                 self.cur_subline = 0
                 continue
 
-            self.exec(program.lines[self.cur_line][self.cur_subline])
+            self.exec(self.program.lines[self.cur_line][self.cur_subline])
             self.cur_subline += 1
 
     def error(self, msg: str) -> Never:
@@ -69,12 +69,6 @@ class Interpreter:
             self.error(f"Incorrect type: can't assign {val!r} to {var}")
         self.variables[var] = val
 
-    def print(self, text="", end="\n", flush=False):
-        print(text, end=end, flush=flush, file=self.outstream)
-
-    def prompt(self, text):
-        self.print(text, end="", flush=True)
-
     def exec(self, node):
         match node:
             case ("for", var, start, end, step):
@@ -96,29 +90,27 @@ class Interpreter:
 
             case ("input", msg, *vars):
                 VAL_TOKENS = r'(\s*"[^"]*")|(\s*[^",][^,]+)'
-                self.prompt(f"{msg}? ")
+                self.io.prompt(f"{msg}? ")
                 while True:
                     vals = []
                     while True:
-                        line = self.instream.readline()
-                        if not self.instream.isatty():
-                            self.print()
+                        line = self.io.readline()
                         vals.extend(
                             v.group(0).strip().strip('"')
                             for v in re.finditer(VAL_TOKENS, line)
                         )
                         if len(vals) < len(vars):
-                            self.prompt("?? ")
+                            self.io.prompt("?? ")
                         else:
                             break
                     if len(vals) > len(vars):
-                        self.print("!Extra input ignored")
+                        self.io.print("!Extra input ignored")
                     for var, val in zip(vars, vals):
                         try:
                             val = var_type(var)(val)
                         except ValueError:
-                            self.print("!Number expected - retry input line")
-                            self.prompt("? ")
+                            self.io.print("!Number expected - retry input line")
+                            self.io.prompt("? ")
                             break
                         self.set_var(var, val)
                     else:
@@ -152,18 +144,14 @@ class Interpreter:
                     match expr:
                         case ("comma",):
                             newline = False
-                            self.next_col = (
-                                (max(self.cur_col, self.next_col) + 14) // 14 * 14
-                            )
+                            self.io.next_zone()
                         case ("semicolon",):
                             newline = False
                         case _:
-                            self.print_value(self.eval(expr))
+                            self.io.print_value(self.eval(expr))
                             newline = True
                 if newline:
-                    self.print()
-                    self.cur_col = 0
-                    self.next_col = 0
+                    self.io.print()
 
             case NEVER:
                 self.error(f"Unimplemented: {node}")
@@ -204,18 +192,3 @@ class Interpreter:
                 return -1 if self.eval(e1) >= self.eval(e2) else 0
             case NEVER:
                 self.error(f"Unimplemented: {expr}")
-
-    def print_value(self, value):
-        if isinstance(value, str):
-            out = value
-        else:
-            out = ""
-            if value >= 0:
-                out += " "
-
-            out += f"{value:.7f}".rstrip("0").rstrip(".")
-            out += " "
-
-        nspaces = self.next_col - self.cur_col
-        self.print(" " * nspaces + out, end="")
-        self.cur_col += nspaces + len(out)

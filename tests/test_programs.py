@@ -423,7 +423,7 @@ def test_program(source, output, input, error):
     instream = io.StringIO(input)
     try:
         prog = Parser(source).parse()
-        Interpreter().run(prog, instream=instream, outstream=outstream)
+        Interpreter(prog, instream=instream, outstream=outstream).run()
     except AcidicaError as e:
         assert str(e) == error
     else:
