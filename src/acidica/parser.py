@@ -160,26 +160,7 @@ class Parser:
         self.eat()
         return ("let", var, self.expr())
 
-    def expr(self):
-        node = self.term()
-
-        while self.tok.kind == "op" and self.tok.text in {"+", "-"}:
-            op = self.tok.text
-            self.eat()
-            node = (op, node, self.term())
-
-        return node
-
-    def term(self):
-        node = self.factor()
-        while self.tok.kind == "op" and self.tok.text in {"*", "/"}:
-            op = self.tok.text
-            self.eat()
-            node = (op, node, self.factor())
-
-        return node
-
-    def factor(self):
+    def prec9(self):
         tok = self.tok
         match tok:
             case Token("num", _) | Token("str", _):
@@ -193,3 +174,21 @@ class Parser:
                 node = self.expr()
                 self.eat("rparen")
                 return node
+
+    def prec6(self):
+        node = self.prec9()
+        while self.tok.kind == "op" and self.tok.text in {"*", "/"}:
+            op = self.tok.text
+            self.eat()
+            node = (op, node, self.prec9())
+        return node
+
+    def prec5(self):
+        node = self.prec6()
+        while self.tok.kind == "op" and self.tok.text in {"+", "-"}:
+            op = self.tok.text
+            self.eat()
+            node = (op, node, self.prec6())
+        return node
+
+    expr = prec5
