@@ -1,5 +1,6 @@
 import dataclasses
 import math
+import random
 import re
 from typing import Never
 
@@ -49,13 +50,14 @@ class Interpreter:
     def __init__(self, program, instream, outstream):
         self.program = program
         self.io = InOut(outstream, instream)
-
-    def run(self):
         self.cur_line = self.program.first
         self.cur_subline = 0
         self.variables = {}
         self.loops = []
+        self.random = random.Random(314159)
+        self.last_rnd = 0
 
+    def run(self):
         while True:
             line = self.program.lines[self.cur_line]
             if self.cur_subline >= len(line):
@@ -293,6 +295,14 @@ class Interpreter:
                     if num == 0:
                         return ""
                     return args[0][-num:]
+                case "RND":
+                    self.expects(1, fn, args)
+                    num = float2int(args[0])
+                    if num < 0:
+                        self.random.seed(num)
+                    if num != 0:
+                        self.last_rnd = self.random.random()
+                    return self.last_rnd
                 case "SGN":
                     self.expects(1, fn, args)
                     if args[0] < 0:

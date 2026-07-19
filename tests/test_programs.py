@@ -487,6 +487,18 @@ TEST_PROGRAMS = [
     ),
     program(
         """
+        10 print "rnd(0):"; rnd(0); "."
+        20 print "rnd(1):"; rnd(1); rnd(0); "."
+        30 print "rnd(-1):"; rnd(-1); rnd(1); rnd(0); "."
+        """,
+        """
+        rnd(0): 0 .
+        rnd(1): 0.19236379  0.19236379 .
+        rnd(-1): 0.13436424  0.84743374  0.84743374 .
+        """,
+    ),
+    program(
+        """
         10 print abs("Hello")
         """,
         error="!Type mismatch for ABS on line 10",
