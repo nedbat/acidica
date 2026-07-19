@@ -157,38 +157,41 @@ class Interpreter:
                 self.error(f"Unimplemented: {node}")
 
     def eval(self, expr):
-        match expr:
-            case ("value", value):
-                return value
-            case ("var", var):
-                return self.get_var(var)
-            case ("+", e1, e2):
-                return self.eval(e1) + self.eval(e2)
-            case ("-", e1, e2):
-                return self.eval(e1) - self.eval(e2)
-            case ("*", e1, e2):
-                return self.eval(e1) * self.eval(e2)
-            case ("/", e1, e2):
-                v1 = self.eval(e1)
-                v2 = self.eval(e2)
-                if v2 == 0:
-                    self.error("Division by zero")
-                return v1 / v2
-            case ("^", e1, e2):
-                return self.eval(e1) ** self.eval(e2)
-            case ("negate", e1):
-                return -self.eval(e1)
-            case ("=", e1, e2):
-                return -1 if self.eval(e1) == self.eval(e2) else 0
-            case ("<>", e1, e2):
-                return -1 if self.eval(e1) != self.eval(e2) else 0
-            case ("<", e1, e2):
-                return -1 if self.eval(e1) < self.eval(e2) else 0
-            case ("<=", e1, e2):
-                return -1 if self.eval(e1) <= self.eval(e2) else 0
-            case (">", e1, e2):
-                return -1 if self.eval(e1) > self.eval(e2) else 0
-            case (">=", e1, e2):
-                return -1 if self.eval(e1) >= self.eval(e2) else 0
-            case NEVER:
-                self.error(f"Unimplemented: {expr}")
+        try:
+            match expr:
+                case ("value", value):
+                    return value
+                case ("var", var):
+                    return self.get_var(var)
+                case ("+", e1, e2):
+                    return self.eval(e1) + self.eval(e2)
+                case ("-", e1, e2):
+                    return self.eval(e1) - self.eval(e2)
+                case ("*", e1, e2):
+                    return self.eval(e1) * self.eval(e2)
+                case ("/", e1, e2):
+                    v1 = self.eval(e1)
+                    v2 = self.eval(e2)
+                    if v2 == 0:
+                        self.error("Division by zero")
+                    return v1 / v2
+                case ("^", e1, e2):
+                    return self.eval(e1) ** self.eval(e2)
+                case ("negate", e1):
+                    return -self.eval(e1)
+                case ("=", e1, e2):
+                    return -1 if self.eval(e1) == self.eval(e2) else 0
+                case ("<>", e1, e2):
+                    return -1 if self.eval(e1) != self.eval(e2) else 0
+                case ("<", e1, e2):
+                    return -1 if self.eval(e1) < self.eval(e2) else 0
+                case ("<=", e1, e2):
+                    return -1 if self.eval(e1) <= self.eval(e2) else 0
+                case (">", e1, e2):
+                    return -1 if self.eval(e1) > self.eval(e2) else 0
+                case (">=", e1, e2):
+                    return -1 if self.eval(e1) >= self.eval(e2) else 0
+                case NEVER:
+                    self.error(f"Unimplemented: {expr}")
+        except TypeError:
+            self.error(f"Type mismatch for {expr[0]}")

@@ -411,6 +411,15 @@ TEST_PROGRAMS = [
         '10 INPUT "What";x 12.34',
         error="!Syntax error on line 10: '12.34'",
     ),
+    # Type mismatches
+    program(
+        '10 print "Hi" + 1',
+        error="!Type mismatch for + on line 10",
+    ),
+    program(
+        '10 print 10 * (4 - 3 * ("Hi" + 1))',
+        error="!Type mismatch for + on line 10",
+    ),
 ]
 
 
