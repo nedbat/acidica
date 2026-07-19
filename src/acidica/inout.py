@@ -23,22 +23,10 @@ class InOut:
             (max(self.cur_col, self.next_col) + ZONE_WIDTH) // ZONE_WIDTH * ZONE_WIDTH
         )
 
-    def print_value(self, value):
-        if isinstance(value, str):
-            out = value
-        else:
-            out = ""
-            if value >= 0:
-                out += " "
-
-            out += f"{value:.8g}"
-            if "." in out:
-                out = out.rstrip("0").rstrip(".")
-            out += " "
-
+    def print_value(self, svalue):
         nspaces = self.next_col - self.cur_col
-        self.print(" " * nspaces + out, end="")
-        self.cur_col += nspaces + len(out)
+        self.print(" " * nspaces + svalue, end="")
+        self.cur_col += nspaces + len(svalue)
 
     def readline(self):
         line = self.instream.readline()

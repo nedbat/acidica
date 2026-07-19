@@ -455,6 +455,7 @@ TEST_PROGRAMS = [
         160 print "sin "; sin(10.5); "."
         170 print "spc "; "x"; spc(10); "x"; spc(0); "x"; spc(2.3); "."
         180 print "sqr"; sqr(10.5); "."
+        190 print "str"; str(10); str(10.543); str(-10.5); "."
         """,
         """
         abs 10.1  10.1  10 .
@@ -475,6 +476,7 @@ TEST_PROGRAMS = [
         sin -0.87969576 .
         spc x          xx  .
         sqr 3.2403703 .
+        str 10 10.543-10.5.
         """,
     ),
     program(
@@ -560,6 +562,12 @@ TEST_PROGRAMS = [
         10 print sqr(-1)
         """,
         error="!Invalid argument for SQR on line 10",
+    ),
+    program(
+        """
+        10 print str("Hello")
+        """,
+        error="!Type mismatch for STR on line 10",
     ),
 ]
 

@@ -24,6 +24,17 @@ def float2int(fval):
     return int(math.floor(fval))
 
 
+def print_repr(value):
+    prepr = ""
+    if value >= 0:
+        prepr += " "
+
+    prepr += f"{value:.8g}"
+    if "." in prepr:
+        prepr = prepr.rstrip("0").rstrip(".")
+    return prepr
+
+
 @dataclasses.dataclass
 class Loop:
     var: str
@@ -156,7 +167,10 @@ class Interpreter:
                         case ("semicolon",):
                             newline = False
                         case _:
-                            self.io.print_value(self.eval(expr))
+                            val = self.eval(expr)
+                            if isinstance(val, (float, int)):
+                                val = print_repr(val) + " "
+                            self.io.print_value(val)
                             newline = True
                 if newline:
                     self.io.print()
@@ -302,6 +316,9 @@ class Interpreter:
                     if num < 0:
                         self.error("Invalid argument for SQR")
                     return math.sqrt(num)
+                case "STR":  # not implemented by vintage-basic?
+                    self.expects(1, fn, args)
+                    return print_repr(args[0])
 
                 case NEVER:
                     self.error(f"Unimplemented function: {fn}")
