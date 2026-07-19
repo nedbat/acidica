@@ -434,6 +434,51 @@ TEST_PROGRAMS = [
         '10 print 10 * (4 - 3 * ("Hi" + 1))',
         error="!Type mismatch for + on line 10",
     ),
+    # Functions
+    program(
+        """
+        10 print "abs"; abs(10.1); abs(-10.1); abs(10); "."
+        20 print "asc"; asc("Hello"); "."
+        30 print "atn"; atn(10.5); "."
+        40 print "chr$ "; chr$(72); "."
+        50 print "cos "; cos(10.5); "."
+        60 print "exp"; exp(10.5); "."
+        70 print "int"; int(10); int(10.4); int(-10.4); "."
+        """,
+        """
+        abs 10.1  10.1  10 .
+        asc 72 .
+        atn 1.4758446 .
+        chr$ H.
+        cos -0.47553693 .
+        exp 36315.503 .
+        int 10  10 -11 .
+        """,
+    ),
+    program(
+        """
+        10 print abs("Hello")
+        """,
+        error="!Type mismatch for ABS on line 10",
+    ),
+    program(
+        """
+        10 print abs(10, 20)
+        """,
+        error="!Wrong number of arguments for ABS on line 10",
+    ),
+    program(
+        """
+        10 print asc("")
+        """,
+        error="!Invalid argument for ASC on line 10",
+    ),
+    program(
+        """
+        10 print asc(10)
+        """,
+        error="!Type mismatch for ASC on line 10",
+    ),
 ]
 
 

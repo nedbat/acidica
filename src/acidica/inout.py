@@ -31,7 +31,9 @@ class InOut:
             if value >= 0:
                 out += " "
 
-            out += f"{value:.7f}".rstrip("0").rstrip(".")
+            out += f"{value:.8g}"
+            if "." in out:
+                out = out.rstrip("0").rstrip(".")
             out += " "
 
         nspaces = self.next_col - self.cur_col

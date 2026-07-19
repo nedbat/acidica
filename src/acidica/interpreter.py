@@ -201,7 +201,45 @@ class Interpreter:
                     return bool_float(self.eval(e1) and self.eval(e2))
                 case ("or", e1, e2):
                     return bool_float(self.eval(e1) or self.eval(e2))
+                case ("fn", fn, *args):
+                    args = [self.eval(a) for a in args]
+                    return self.function(fn, *args)
                 case NEVER:
                     self.error(f"Unimplemented: {expr}")
         except TypeError:
             self.error(f"Type mismatch for {expr[0]}")
+
+    def expects(self, nargs, fn, args):
+        if len(args) != nargs:
+            self.error(f"Wrong number of arguments for {fn}")
+
+    def function(self, fn, *args):
+        try:
+            match fn:
+                case "ABS":
+                    self.expects(1, fn, args)
+                    return abs(args[0])
+                case "ASC":
+                    self.expects(1, fn, args)
+                    if not args[0]:
+                        self.error("Invalid argument for ASC")
+                    return ord(args[0][0])
+                case "ATN":
+                    self.expects(1, fn, args)
+                    return math.atan(args[0])
+                case "CHR$":
+                    self.expects(1, fn, args)
+                    return chr(args[0])
+                case "COS":
+                    self.expects(1, fn, args)
+                    return math.cos(args[0])
+                case "EXP":
+                    self.expects(1, fn, args)
+                    return math.exp(args[0])
+                case "INT":
+                    self.expects(1, fn, args)
+                    return int(math.floor(args[0]))
+                case NEVER:
+                    self.error(f"Unimplemented function: {fn}")
+        except TypeError:
+            self.error(f"Type mismatch for {fn}")

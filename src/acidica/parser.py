@@ -174,6 +174,17 @@ class Parser:
                 node = self.expr()
                 self.eat("rparen")
                 return node
+            case Token("fn", fn):
+                self.eat()
+                self.eat("lparen")
+                args = []
+                while True:
+                    args.append(self.expr())
+                    if self.tok.kind == "rparen":
+                        break
+                    self.eat("comma")
+                self.eat("rparen")
+                return ("fn", fn, *args)
 
     def prec8(self):
         match self.tok:
