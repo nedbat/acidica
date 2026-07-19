@@ -457,6 +457,8 @@ TEST_PROGRAMS = [
         180 print "sqr"; sqr(10.5); "."
         190 print "str"; str(10); str(10.543); str(-10.5); "."
         200 print "tab"; tab(10); "x"; tab(15); "x"; tab(5); "x"
+        210 print "tan"; tan(10.5); "."
+        220 print "val"; val("3.14159"); val("Hello"); "."
         """,
         """
         abs 10.1  10.1  10 .
@@ -479,6 +481,8 @@ TEST_PROGRAMS = [
         sqr 3.2403703 .
         str 10 10.543-10.5.
         tab       x    xx
+        tan 1.8499 .
+        val 3.14159  0 .
         """,
     ),
     program(
@@ -570,6 +574,12 @@ TEST_PROGRAMS = [
         10 print str("Hello")
         """,
         error="!Type mismatch for STR on line 10",
+    ),
+    program(
+        """
+        10 print val(3.14159)
+        """,
+        error="!Type mismatch for VAL on line 10",
     ),
 ]
 

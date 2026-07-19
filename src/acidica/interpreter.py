@@ -322,6 +322,15 @@ class Interpreter:
                 case "TAB":
                     self.expects(1, fn, args)
                     return self.io.tab(float2int(args[0]))
+                case "TAN":
+                    self.expects(1, fn, args)
+                    return math.tan(args[0])
+                case "VAL":
+                    self.expects(1, fn, args)
+                    try:
+                        return float(args[0] + "")  # trick to force typeerror for floats
+                    except ValueError:
+                        return 0
 
                 case NEVER:
                     self.error(f"Unimplemented function: {fn}")
