@@ -367,7 +367,7 @@ TEST_PROGRAMS = [
         10 INPUT "What"; x$, y%, z
         20 PRINT x$, y%, z
         """,
-        """What? \nHello there    12            3.14159 \n""",
+        "What? \nHello there    12            3.14159 \n",
         input="""
         "Hello there",  12, 3.14159
         """,
@@ -377,7 +377,7 @@ TEST_PROGRAMS = [
         10 INPUT "What"; x$, y%, z
         20 PRINT x$, y%, z
         """,
-        """What? \n?? \nHello          12            3.14159 \n""",
+        "What? \n?? \nHello          12            3.14159 \n",
         input="""
         Hello
         12, 3.14159
@@ -388,7 +388,7 @@ TEST_PROGRAMS = [
         10 INPUT "What"; x$, y%, z
         20 PRINT x$, y%, z
         """,
-        """What? \n!Extra input ignored\nHello          12            3.14159 \n""",
+        "What? \n!Extra input ignored\nHello          12            3.14159 \n",
         input="""
         Hello, 12, 3.14159, 1, 2, 3, 4
         """,
@@ -398,7 +398,7 @@ TEST_PROGRAMS = [
         10 INPUT "What"; x$, y%, z
         20 PRINT x$, y%, z
         """,
-        """What? \n!Number expected - retry input line\n? \nGoodbye        34            2.71828 \n""",
+        "What? \n!Number expected - retry input line\n? \nGoodbye        34            2.71828 \n",
         input="""
         Hello, 12.234, 3.14159
         Goodbye, 34, 2.71828
