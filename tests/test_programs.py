@@ -641,6 +641,37 @@ TEST_PROGRAMS = [
         """,
         "Hello\n",
     ),
+    # AND/OR
+    program(
+        """
+        10 T = (1 = 1)
+        20 F = (1 <> 1)
+        30 if T and T then print "t and t"
+        40 if T and F then print "t and f": REM False
+        50 if T or T then print "t or t"
+        60 if T or F then print "t or f"
+        70 if T or T and F then print "t or t and f"
+        80 if (T or T) and F then print "(t or t) and f": REM False
+        90 if F and T or T then print "f and t or t"
+        100 if F and (T or T) then print "f and (t or t)": REM False
+        110 if T and not F then print "t and not f"
+        120 if not F and T then print "not f and t"
+        130 if not (F and T) then print "not (f and t)"
+        140 if not T and F then print "not t and f": REM False
+        150 if not (T and F) then print "not (t and f)"
+        """,
+        """
+        t and t
+        t or t
+        t or f
+        t or t and f
+        f and t or t
+        t and not f
+        not f and t
+        not (f and t)
+        not (t and f)
+        """,
+    ),
 ]
 
 EXAMPLES = [
