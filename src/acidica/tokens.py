@@ -19,8 +19,8 @@ class Token:
             case "str":
                 return self.text[1:-1]
 
-            case _:
-                return self.text
+            case _NEVER:
+                raise Exception("Can't happen")
 
 
 KEYWORDS = "|".join(

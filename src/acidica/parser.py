@@ -274,7 +274,6 @@ class Parser:
     def prec2(self):
         node = self.prec3()
         while self.tok.kind == "op" and self.tok.text == "AND":
-            op = self.tok.text
             self.eat()
             node = ("and", node, self.prec3())
         return node
@@ -282,7 +281,6 @@ class Parser:
     def prec1(self):
         node = self.prec2()
         while self.tok.kind == "op" and self.tok.text == "OR":
-            op = self.tok.text
             self.eat()
             node = ("or", node, self.prec2())
         return node

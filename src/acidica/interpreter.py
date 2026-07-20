@@ -118,7 +118,7 @@ class Interpreter:
             case ("if", cond):
                 cond = self.eval(cond)
                 if isinstance(cond, str):
-                    self.error(f"Type mismatch for IF")
+                    self.error("Type mismatch for IF")
                 if not cond:
                     self.next_line()
 
@@ -190,7 +190,7 @@ class Interpreter:
                 if newline:
                     self.io.print()
 
-            case NEVER:
+            case _NEVER:
                 self.error(f"Unimplemented: {node}")
 
     def eval(self, expr):
@@ -237,7 +237,7 @@ class Interpreter:
                 case ("fn", fn, *args):
                     args = [self.eval(a) for a in args]
                     return self.function(fn, *args)
-                case NEVER:
+                case _NEVER:
                     self.error(f"Unimplemented: {expr}")
         except TypeError:
             self.error(f"Type mismatch for {expr[0]}")
@@ -359,7 +359,7 @@ class Interpreter:
                     except ValueError:
                         return 0
 
-                case NEVER:
+                case _NEVER:
                     self.error(f"Unimplemented function: {fn}")
         except TypeError:
             self.error(f"Type mismatch for {fn}")
