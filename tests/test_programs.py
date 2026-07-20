@@ -618,6 +618,29 @@ TEST_PROGRAMS = [
         """,
         error="!Type mismatch for IF on line 10",
     ),
+    # Stop/End
+    program(
+        """
+        10 print "Hello"
+        20 end
+        30 print "more"
+        """,
+        "Hello\n",
+    ),
+    program(
+        """
+        10 print "Hello"
+        20 stop
+        30 print "more"
+        """,
+        "Hello\n",
+    ),
+    program(
+        """
+        10 print "Hello": stop: print "more"
+        """,
+        "Hello\n",
+    ),
     # Vintage-basic examples
     program(
         "./tests/examples/diamond.bas",

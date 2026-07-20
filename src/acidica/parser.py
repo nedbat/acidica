@@ -161,6 +161,10 @@ class Parser:
                                     items.append(item)
                         line.append(("print", *items))
 
+                    case Token("key", "STOP"):
+                        self.eat()
+                        line.append(("end",))
+
                     case Token("var", _):
                         line.append(self.parse_let())
 
