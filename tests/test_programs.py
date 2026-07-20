@@ -641,6 +641,9 @@ TEST_PROGRAMS = [
         """,
         "Hello\n",
     ),
+]
+
+EXAMPLES = [
     # Vintage-basic examples
     program(
         "./tests/examples/diamond.bas",
@@ -671,7 +674,7 @@ TEST_PROGRAMS = [
 
 @pytest.mark.parametrize(
     "source, output, input, error",
-    TEST_PROGRAMS,
+    TEST_PROGRAMS + EXAMPLES,
 )
 def test_program(source, output, input, error):
     outstream = io.StringIO()
