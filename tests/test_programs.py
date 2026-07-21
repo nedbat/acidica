@@ -750,6 +750,13 @@ TEST_PROGRAMS = [
         """,
         error="!Expected comma, saw eol on line 10",
     ),
+    program(
+        """
+        100 DIM A(10)
+        110 DIM A(20)
+        """,
+        error="!Redim'd array on line 110",
+    ),
     # On GOTO
     program(
         """

@@ -143,8 +143,11 @@ class Interpreter:
     def exec(self, node):
         match node:
             case ("dim", var, *args):
+                var = var + "("
+                if var in self.variables:
+                    self.error("Redim'd array")
                 args = [float2int(self.eval(a)) for a in args]
-                self.variables[var + "("] = Array(args, var_type(var)())
+                self.variables[var] = Array(args, var_type(var)())
 
             case ("end",):
                 self.running = False
