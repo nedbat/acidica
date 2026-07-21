@@ -167,6 +167,26 @@ class Parser:
                             var = None
                         line.append(("next", var))
 
+                    case Token("key", "ON"):
+                        self.eat()
+                        expr = self.expr()
+                        self.eat_key("GO")
+                        if self.tok == Token("key", "TO"):
+                            self.eat()
+                            op = "ongoto"
+                        else:
+                            self.error()
+                        labels = []
+                        while True:
+                            if self.tok.kind != "num":
+                                self.error()
+                            labels.append(self.tok.value())
+                            self.eat()
+                            if self.tok.kind != "comma":
+                                break
+                            self.eat()
+                        line.append((op, expr, *labels))
+
                     case Token("key", "PRINT") | Token("key", "?"):
                         self.eat()
                         items = []

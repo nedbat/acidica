@@ -226,6 +226,12 @@ class Interpreter:
                 else:
                     self.loops.pop()
 
+            case ("ongoto", expr, *labels):
+                num = float2int(self.eval(expr))
+                if 1 <= num <= len(labels):
+                    self.cur_line = labels[num - 1]
+                    self.cur_subline = -1  # the main loop will increment it
+
             case ("print", *exprs):
                 newline = True
                 for expr in exprs:

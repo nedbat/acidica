@@ -753,6 +753,41 @@ TEST_PROGRAMS = [
         """,
         error="!Expected comma, saw eol on line 10",
     ),
+    # On GOTO
+    program(
+        """
+        10 X = 2
+        20 on X goto 100, 200, 300
+        100 print "100"
+        200 print "200"
+        300 print "300"
+        400 X = 0
+        410 on X goto 100, 200, 300
+        500 print "500"
+        600 X = 4
+        610 on X goto 100, 200, 300
+        700 print "700"
+        """,
+        "200\n300\n500\n700\n",
+    ),
+    program(
+        """
+        10 ON THE TABLE
+        """,
+        error="!Expected GO, saw TAB on line 10",
+    ),
+    program(
+        """
+        10 ON X GO FISH
+        """,
+        error="!Syntax error on line 10: 'FI'",
+    ),
+    program(
+        """
+        10 ON X GO TO THE TOP
+        """,
+        error="!Syntax error on line 10: 'TH'",
+    ),
 ]
 
 EXAMPLES = [
@@ -780,6 +815,11 @@ EXAMPLES = [
         "./tests/examples/stars.bas",
         "./tests/examples/stars.out",
         input="./tests/examples/stars.in",
+    ),
+    program(
+        "./tests/examples/amazing.bas",
+        "./tests/examples/amazing.out",
+        input="./tests/examples/amazing.in",
     ),
 ]
 

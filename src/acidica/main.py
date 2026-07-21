@@ -13,8 +13,7 @@ def main():
         source = Path(sys.argv[1]).read_text()
     else:
         source = textwrap.dedent("""\
-            60 print A(1, 2, 3)
-            70 A(X, y, z) = B2(12)
+            60 on X goto 123, 456, 789
         """)
     try:
         prog = Parser(source).parse()
