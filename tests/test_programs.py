@@ -331,7 +331,7 @@ TEST_PROGRAMS = [
     ),
     program(
         "10 for i = 1 10",
-        error="!Expected TO, saw 10 on line 10: '10'",
+        error="!Expected TO, saw 10 on line 10",
     ),
     program(
         "10 for i = 1 to 10 Step LET",
@@ -418,7 +418,7 @@ TEST_PROGRAMS = [
     # Input errors
     program(
         "10 INPUT",
-        error="!Syntax error on line 10",
+        error="!Syntax error on line 10: saw eol",
     ),
     program(
         '10 INPUT "What"',
@@ -426,11 +426,11 @@ TEST_PROGRAMS = [
     ),
     program(
         '10 INPUT "What";',
-        error="!Syntax error on line 10",
+        error="!Syntax error on line 10: saw eol",
     ),
     program(
         '10 INPUT "What";x,',
-        error="!Syntax error on line 10",
+        error="!Syntax error on line 10: saw eol",
     ),
     program(
         '10 INPUT "What";x 12.34',

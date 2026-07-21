@@ -14,21 +14,24 @@ class Parser:
     def error(self, msg="Syntax error", line_num=True, token=True) -> Never:
         if line_num:
             msg += f" on line {self.line_num}"
-        if token and self.tok.text:
-            msg += f": '{self.tok.text}'"
+        if token:
+            if self.tok.text:
+                msg += f": '{self.tok.text}'"
+            else:
+                msg += f": saw {self.tok.kind}"
         raise AcidicaError(msg)
 
     def eat(self, kind=None) -> None:
         if kind is None or self.tok.kind == kind:
             self.tok = next(self.toks)
         else:
-            self.error(f"Expected {kind}, saw {self.tok.kind}")
+            self.error(f"Expected {kind}, saw {self.tok.kind}", token=False)
 
     def eat_key(self, text):
         if self.tok.kind == "key" and self.tok.text == text:
             self.tok = next(self.toks)
         else:
-            self.error(f"Expected {text}, saw {self.tok.text}")
+            self.error(f"Expected {text}, saw {self.tok.text}", token=False)
 
     def parse(self) -> Program:
         lines = {}
