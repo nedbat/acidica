@@ -30,17 +30,14 @@ def program(
     *,
     input: str = "",
     error: str | None = None,
-    id=None,
 ):
-    if id is None:
-        call_line = sys._getframe(1).f_lineno
-        id = f"line_{call_line}"
+    call_line = sys._getframe(1).f_lineno
     return pytest.param(
         easy_text(source),
         easy_text(output),
         easy_text(input),
         error,
-        id=id,
+        id=f"line_{call_line}",
     )
 
 
