@@ -9,23 +9,27 @@ from .inout import InOut
 
 
 def var_type(var: str):
-    if var.endswith("%"):
+    """What Python type does this variable expect?"""
+    if "%" in var:
         return int
-    elif var.endswith("$"):
+    elif "$" in var:
         return str
     else:
         return float
 
 
 def bool2float(bval):
+    """BASIC bools are -1 for true, 0 for false. Convert Python to BASIC."""
     return -1 if bval else 0
 
 
 def float2int(fval):
+    """When an int is expected, a float is ok, and will be floor'ed."""
     return int(math.floor(fval))
 
 
 def print_repr(value):
+    """Create the string version of a number for printing."""
     prepr = ""
     if value >= 0:
         prepr += " "
@@ -38,6 +42,7 @@ def print_repr(value):
 
 @dataclasses.dataclass
 class Loop:
+    """A FOR loop in progress."""
     var: str
     line: int
     subline: int
