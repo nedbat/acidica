@@ -1,5 +1,6 @@
 import io
 import re
+import sys
 import textwrap
 from pathlib import Path
 
@@ -29,8 +30,18 @@ def program(
     *,
     input: str = "",
     error: str | None = None,
-) -> tuple[str, str, str, str | None]:
-    return (easy_text(source), easy_text(output), easy_text(input), error)
+    id=None,
+):
+    if id is None:
+        call_line = sys._getframe(1).f_lineno
+        id = f"line_{call_line}"
+    return pytest.param(
+        easy_text(source),
+        easy_text(output),
+        easy_text(input),
+        error,
+        id=id,
+    )
 
 
 TEST_PROGRAMS = [
