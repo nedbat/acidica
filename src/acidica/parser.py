@@ -65,6 +65,26 @@ class Parser:
                     case Token("colon", _):
                         self.eat()
 
+                    case Token("key", "DIM"):
+                        self.eat()
+                        while True:
+                            if self.tok.kind != "var":
+                                self.error()
+                            var = self.tok.text
+                            self.eat()
+                            self.eat("lparen")
+                            dims = []
+                            while True:
+                                dims.append(self.expr())
+                                if self.tok.kind == "rparen":
+                                    self.eat()
+                                    break
+                                self.eat("comma")
+                            line.append(("dim", var, *dims))
+                            if self.tok.kind != "comma":
+                                break
+                            self.eat()
+
                     case Token("key", "END"):
                         self.eat()
                         line.append(("end",))
@@ -179,10 +199,25 @@ class Parser:
     def parse_let(self):
         var = self.tok.text
         self.eat()
+        if self.tok.kind == "lparen":
+            self.eat()
+            args = self.arg_list()
+        else:
+            args = []
         if self.tok != Token("op", "="):
             self.error()
         self.eat()
-        return ("let", var, self.expr())
+        return ("let", var, *args, self.expr())
+
+    def arg_list(self):
+        args = []
+        while True:
+            args.append(self.expr())
+            if self.tok.kind == "rparen":
+                break
+            self.eat("comma")
+        self.eat("rparen")
+        return args
 
     def prec9(self):
         tok = self.tok
@@ -192,7 +227,12 @@ class Parser:
                 return ("value", tok.value())
             case Token("var", var):
                 self.eat()
-                return ("var", var)
+                if self.tok.kind == "lparen":
+                    self.eat()
+                    args = self.arg_list()
+                else:
+                    args = []
+                return ("var", var, *args)
             case Token("lparen", _):
                 self.eat()
                 node = self.expr()
@@ -201,13 +241,7 @@ class Parser:
             case Token("fn", fn):
                 self.eat()
                 self.eat("lparen")
-                args = []
-                while True:
-                    args.append(self.expr())
-                    if self.tok.kind == "rparen":
-                        break
-                    self.eat("comma")
-                self.eat("rparen")
+                args = self.arg_list()
                 return ("fn", fn, *args)
 
     def prec8(self):

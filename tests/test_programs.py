@@ -683,6 +683,76 @@ TEST_PROGRAMS = [
         not (t and f)
         """,
     ),
+    # Arrays
+    program(
+        """
+        10 PRINT "zeros:"; A(0); A(10); A(A); "."
+        """,
+        "zeros: 0  0  0 .\n",
+    ),
+    program(
+        """
+        10 PRINT A(-1)
+        """,
+        error="!Negative array index on line 10",
+    ),
+    program(
+        """
+        10 PRINT A(11)
+        """,
+        error="!Out of array bounds on line 10",
+    ),
+    program(
+        """
+        10 PRINT A(1, 2)
+        """,
+        error="!Mismatched array dimensions on line 10",
+    ),
+    program(
+        """
+        10 A(5) = 17
+        20 print "Look:"; A(0); A(5); "."
+        """,
+        "Look: 0  17 .\n",
+    ),
+    program(
+        """
+        10 A(11) = 17
+        """,
+        error="!Out of array bounds on line 10",
+    ),
+    program(
+        """
+        10 LET A = 3
+        20 PRINT ":"; A(A); "."
+        """,
+        ": 0 .\n",
+    ),
+    program(
+        """
+        10 DIM A(3, 4)
+        20 PRINT ":"; A(1, 1); A(3, 4); "."
+        30 DIM S$(1, 2), I%(1, 2, 3)
+        40 S$(0, 0) = "Hello": I%(1, 1, 1) = 23
+        50 PRINT ":"; S$(0, 0); ":"; I%(1, 1, 1); "."
+        """,
+        """
+        : 0  0 .
+        :Hello: 23 .
+        """,
+    ),
+    program(
+        """
+        10 DIM 23
+        """,
+        error="!Syntax error on line 10: '23'",
+    ),
+    program(
+        """
+        10 DIM A(1
+        """,
+        error="!Expected comma, saw eol on line 10",
+    ),
 ]
 
 EXAMPLES = [

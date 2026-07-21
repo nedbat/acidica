@@ -2,7 +2,7 @@ import dataclasses
 import math
 import random
 import re
-from typing import Never
+from typing import Any, Iterable, Never
 
 from .exceptions import AcidicaError
 from .inout import InOut
@@ -40,9 +40,39 @@ def print_repr(value):
     return prepr
 
 
+class Array:
+    """A multi-dimensional array."""
+
+    def __init__(self, dims: Iterable[int], default: Any):
+        self.dims = tuple(dims)
+        self.default = default
+        self.data: dict[tuple[int, ...], Any] = {}
+
+    def __repr__(self):
+        return f"Array({','.join(map(str, self.dims))})"
+
+    def check_args(self, errfn, *args):
+        if len(args) != len(self.dims):
+            errfn("Mismatched array dimensions")
+        if any(a < 0 for a in args):
+            errfn("Negative array index")
+        for a, d in zip(args, self.dims):
+            if a > d:
+                errfn("Out of array bounds")
+
+    def get(self, errfn, *args):
+        self.check_args(errfn, *args)
+        return self.data.get(args, self.default)
+
+    def set(self, errfn, val, *args):
+        self.check_args(errfn, *args)
+        self.data[args] = val
+
+
 @dataclasses.dataclass
 class Loop:
     """A FOR loop in progress."""
+
     var: str
     line: int
     subline: int
@@ -82,13 +112,20 @@ class Interpreter:
         msg += f" on line {self.cur_line}"
         raise AcidicaError(msg)
 
-    def get_var(self, var):
+    def get_var(self, var, *args):
         value = self.variables.get(var)
         if value is None:
             value = var_type(var)()
+            if args:
+                # Default array is indexed 0..10
+                self.variables[var] = Array([10], value)
+            self.set_var(var, value, *args)
+        else:
+            if isinstance(value, Array):
+                value = value.get(self.error, *args)
         return value
 
-    def set_var(self, var, val):
+    def set_var(self, var, val, *args):
         vtype = var_type(var)
         if vtype is int and isinstance(val, float):
             val = float2int(val)
@@ -96,10 +133,19 @@ class Interpreter:
             val = float(val)
         elif not isinstance(val, vtype):
             self.error(f"Incorrect type: can't assign {val!r} to {var}")
-        self.variables[var] = val
+        if args:
+            if var not in self.variables:
+                self.variables[var] = Array([10], vtype())
+            self.variables[var].set(self.error, val, *args)
+        else:
+            self.variables[var] = val
 
     def exec(self, node):
         match node:
+            case ("dim", var, *args):
+                args = [float2int(self.eval(a)) for a in args]
+                self.variables[var + "("] = Array(args, var_type(var)())
+
             case ("end",):
                 self.running = False
 
@@ -155,8 +201,11 @@ class Interpreter:
                     else:
                         break
 
-            case ("let", var, expr):
-                self.set_var(var, self.eval(expr))
+            case ("let", var, *args, expr):
+                args = [float2int(self.eval(a)) for a in args]
+                if args:
+                    var = var + "("
+                self.set_var(var, self.eval(expr), *args)
 
             case ("next", var):
                 if var is not None:
@@ -203,8 +252,11 @@ class Interpreter:
             match expr:
                 case ("value", value):
                     return value
-                case ("var", var):
-                    return self.get_var(var)
+                case ("var", var, *args):
+                    args = [float2int(self.eval(a)) for a in args]
+                    if args:
+                        var = var + "("
+                    return self.get_var(var, *args)
                 case ("+", e1, e2):
                     return self.eval(e1) + self.eval(e2)
                 case ("-", e1, e2):
@@ -245,6 +297,9 @@ class Interpreter:
                 case _NEVER:
                     self.error(f"Unimplemented: {expr}")
         except TypeError:
+            import traceback
+
+            traceback.print_exc()
             self.error(f"Type mismatch for {expr[0]}")
 
     def expects(self, nargs, fn, args):
