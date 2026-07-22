@@ -291,6 +291,10 @@ class Interpreter:
                     val = var_type(var)(self.cur_data.pop(0))
                     self.set_var(var, val, *self.eval_var_args(args))
 
+            case ("restore", label):
+                self.data_ptr.jump(label or self.program.first)
+                self.cur_data = []
+
             case _NEVER:
                 self.error(f"Unimplemented: {node}")
 

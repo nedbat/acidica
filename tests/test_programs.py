@@ -873,6 +873,38 @@ TEST_PROGRAMS = [
         """,
         "elements: 0  0  17  0  23  0 .\n",
     ),
+    # RESTORE
+    program(
+        """
+        10 for i = 1 to 3
+        20 read x, y, z
+        30 print "nums:"; i; x; y; z; "."
+        40 restore
+        50 next i
+        60 data 17, 23, 42
+        """,
+        """
+        nums: 1  17  23  42 .
+        nums: 2  17  23  42 .
+        nums: 3  17  23  42 .
+        """,
+    ),
+    program(
+        """
+        10 for i = 1 to 3
+        20 read x
+        30 print "nums:"; i; x; "."
+        40 restore 70
+        50 next i
+        60 data 17, 23, 42
+        70 data 99
+        """,
+        """
+        nums: 1  17 .
+        nums: 2  99 .
+        nums: 3  99 .
+        """,
+    ),
 ]
 
 EXAMPLES = [
