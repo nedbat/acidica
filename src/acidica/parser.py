@@ -2,7 +2,7 @@ from typing import Never
 
 from .exceptions import AcidicaError
 from .program import Program
-from .tokens import Token, tokenize
+from .tokens import Token, parse_data, tokenize
 
 
 class Parser:
@@ -64,6 +64,13 @@ class Parser:
 
                     case Token("colon", _):
                         self.eat()
+
+                    case Token("data", data):
+                        line.append(("data", *parse_data(data)))
+                        self.eat()
+
+                    case Token("key", "DATA"):
+                        pass
 
                     case Token("key", "DIM"):
                         self.eat()
@@ -139,16 +146,7 @@ class Parser:
                             self.eat("semicolon")
                         else:
                             msg = ""
-                        vars = []
-                        while True:
-                            if self.tok.kind != "var":
-                                self.error()
-                            vars.append(self.tok.text)
-                            self.eat()
-                            if self.tok.kind != "comma":
-                                break
-                            self.eat()
-                        line.append(("input", msg, *vars))
+                        line.append(("input", msg, *self.var_list()))
 
                     case Token("key", "LET"):
                         self.eat()
@@ -204,6 +202,10 @@ class Parser:
                                     items.append(item)
                         line.append(("print", *items))
 
+                    case Token("key", "READ"):
+                        self.eat()
+                        line.append(("read", *self.var_list()))
+
                     case Token("key", "STOP"):
                         self.eat()
                         line.append(("end",))
@@ -228,6 +230,18 @@ class Parser:
             self.error()
         self.eat()
         return ("let", var, *args, self.expr())
+
+    def var_list(self):
+        vars = []
+        while True:
+            if self.tok.kind != "var":
+                self.error()
+            vars.append(self.tok.text)
+            self.eat()
+            if self.tok.kind != "comma":
+                break
+            self.eat()
+        return vars
 
     def arg_list(self):
         args = []

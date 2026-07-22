@@ -1,11 +1,11 @@
 import dataclasses
 import math
 import random
-import re
 from typing import Any, Iterable, Never
 
 from .exceptions import AcidicaError
 from .inout import InOut
+from .tokens import parse_data
 
 
 def var_type(var: str):
@@ -121,6 +121,8 @@ class Interpreter:
         self.loops = []
         self.random = random.Random(314159)
         self.last_rnd = 0
+        self.data_ptr = StatementPointer(self.program)
+        self.cur_data = []
 
     def run(self):
         while self.running:
@@ -163,6 +165,9 @@ class Interpreter:
 
     def exec(self, node):
         match node:
+            case ("data", *vals):
+                pass
+
             case ("dim", var, *args):
                 var = var + "("
                 if var in self.variables:
@@ -198,16 +203,12 @@ class Interpreter:
                     self.stmt_ptr.next_line()
 
             case ("input", msg, *vars):
-                VAL_TOKENS = r'(\s*"[^"]*")|(\s*[^",][^,]+)'
                 self.io.prompt(f"{msg}? ")
                 while True:
                     vals = []
                     while True:
                         line = self.io.readline()
-                        vals.extend(
-                            v.group(0).strip().strip('"')
-                            for v in re.finditer(VAL_TOKENS, line)
-                        )
+                        vals.extend(parse_data(line))
                         if len(vals) < len(vars):
                             self.io.prompt("?? ")
                         else:
@@ -218,6 +219,7 @@ class Interpreter:
                         try:
                             val = var_type(var)(val)
                         except ValueError:
+                            # TODO: inputting "17 hello" should produce 17
                             self.io.print("!Number expected - retry input line")
                             self.io.prompt("? ")
                             break
@@ -271,6 +273,19 @@ class Interpreter:
                             newline = True
                 if newline:
                     self.io.print()
+
+            case ("read", *vars):
+                for var in vars:
+                    if not self.cur_data:
+                        while True:
+                            stmt = self.data_ptr.stmt()
+                            if stmt is None:
+                                self.error("Out of data")
+                            if stmt[0] == "data":
+                                self.cur_data = list(stmt[1:])
+                                break
+                    val = var_type(var)(self.cur_data.pop(0))
+                    self.set_var(var, val)
 
             case _NEVER:
                 self.error(f"Unimplemented: {node}")

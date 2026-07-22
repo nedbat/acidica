@@ -806,6 +806,51 @@ TEST_PROGRAMS = [
         """,
         error="!Syntax error on line 10: 'TH'",
     ),
+    # DATA
+    program(
+        """
+        10 REM Data lines are parsed differently
+        20 Print "Hello": DATA 17: PRINT 43
+        30 Print "Bye"
+        """,
+        """
+        Hello
+        Bye
+        """,
+    ),
+    program(
+        """
+        10 read x, y, s$
+        20 data 17,   23,  Hello there
+        30 print "the data:"; x; y; "x"; s$; "."
+        """,
+        "the data: 17  23 xHello there.\n",
+    ),
+    program(
+        """
+        10 read x, y, s$
+        20 data 17,   23,  Hello there
+        30 print "the data:"; x; y; "x"; s$; "."
+        40 data 23
+        50 data Hello there
+        """,
+        "the data: 17  23 xHello there.\n",
+    ),
+    program(
+        """
+        10 read x, y, s$
+        20 data 17, 23
+        30 print "the data:"; x; y; "x"; s$; "."
+        """,
+        error="!Out of data on line 10",
+    ),
+    program(
+        """
+        10 read x, y, s$
+        30 print "the data:"; x; y; "x"; s$; "."
+        """,
+        error="!Out of data on line 10",
+    ),
 ]
 
 EXAMPLES = [

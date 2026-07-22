@@ -40,6 +40,7 @@ FUNCTIONS = "|".join(
 OPWORDS = "|".join("NOT AND OR".split())
 
 TOKENS = rf"""(?xmi)
+    (?P<data>DATA.*$)                                   |
     (REM.*$)                                            |
     (?P<lparen>\()                                      |
     (?P<rparen>\))                                      |
@@ -70,4 +71,14 @@ def tokenize(text: str) -> Iterator[Token]:
                 m = re.fullmatch(r"([A-Z]{,2})[A-Z]*([0-9]?)[0-9]*([$%]?)", text)
                 assert m
                 text = "".join(m.groups())
+            elif kind == "data":
+                text = text[4:].strip()
             yield Token(kind, text)
+
+
+DATA_TOKENS = r'(\s*"[^"]*")|(\s*[^",][^,]+)'
+
+
+def parse_data(line):
+    """Get values for INPUT or DATA."""
+    return (v.group(0).strip().strip('"') for v in re.finditer(DATA_TOKENS, line))
