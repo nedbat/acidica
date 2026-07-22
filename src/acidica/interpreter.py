@@ -69,13 +69,43 @@ class Array:
         self.data[args] = val
 
 
+class StatementPointer:
+    def __init__(self, program):
+        self.program = program
+        self.jump(self.program.first)
+
+    def stmt(self):
+        while True:
+            if self.line_num is None:
+                return None
+            line = self.program.lines[self.line_num]
+            if self.subline >= len(line):
+                self.next_line()
+                continue
+            stmt = line[self.subline]
+            self.subline += 1
+            return stmt
+
+    def next_line(self):
+        self.jump(self.program.nexts.get(self.line_num))
+
+    def jump(self, line_num):
+        self.line_num = line_num
+        self.subline = 0
+
+    def copy(self):
+        sp = StatementPointer(self.program)
+        sp.line_num = self.line_num
+        sp.subline = self.subline
+        return sp
+
+
 @dataclasses.dataclass
 class Loop:
     """A FOR loop in progress."""
 
     var: str
-    line: int
-    subline: int
+    top_stmt: StatementPointer
     val: float
     step: float
     end: float
@@ -86,8 +116,7 @@ class Interpreter:
         self.program = program
         self.io = InOut(outstream, instream)
         self.running = True
-        self.cur_line = self.program.first
-        self.cur_subline = 0
+        self.stmt_ptr = StatementPointer(self.program)
         self.variables = {}
         self.loops = []
         self.random = random.Random(314159)
@@ -95,21 +124,13 @@ class Interpreter:
 
     def run(self):
         while self.running:
-            line = self.program.lines[self.cur_line]
-            if self.cur_subline >= len(line):
-                self.next_line()
-            else:
-                self.exec(self.program.lines[self.cur_line][self.cur_subline])
-            self.cur_subline += 1
-
-    def next_line(self):
-        self.cur_subline = -1
-        self.cur_line = self.program.nexts.get(self.cur_line)
-        if self.cur_line is None:
-            self.running = False
+            stmt = self.stmt_ptr.stmt()
+            if stmt is None:
+                break
+            self.exec(stmt)
 
     def error(self, msg: str) -> Never:
-        msg += f" on line {self.cur_line}"
+        msg += f" on line {self.stmt_ptr.line_num}"
         raise AcidicaError(msg)
 
     def get_var(self, var, *args):
@@ -156,8 +177,7 @@ class Interpreter:
                 val = self.eval(start)
                 loop = Loop(
                     var=var,
-                    line=self.cur_line,
-                    subline=self.cur_subline,
+                    top_stmt=self.stmt_ptr.copy(),
                     val=val,
                     step=self.eval(step),
                     end=self.eval(end),
@@ -168,15 +188,14 @@ class Interpreter:
             case ("goto", line_num):
                 if line_num not in self.program.lines:
                     self.error(f"Bad GOTO target {line_num}")
-                self.cur_line = line_num
-                self.cur_subline = -1  # the main loop will increment it
+                self.stmt_ptr.jump(line_num)
 
             case ("if", cond):
                 cond = self.eval(cond)
                 if isinstance(cond, str):
                     self.error("Type mismatch for IF")
                 if not cond:
-                    self.next_line()
+                    self.stmt_ptr.next_line()
 
             case ("input", msg, *vars):
                 VAL_TOKENS = r'(\s*"[^"]*")|(\s*[^",][^,]+)'
@@ -226,16 +245,14 @@ class Interpreter:
                     more = loop.val >= loop.end
                 if more:
                     self.set_var(loop.var, loop.val)
-                    self.cur_line = loop.line
-                    self.cur_subline = loop.subline
+                    self.stmt_ptr = loop.top_stmt.copy()
                 else:
                     self.loops.pop()
 
             case ("ongoto", expr, *labels):
                 num = float2int(self.eval(expr))
                 if 1 <= num <= len(labels):
-                    self.cur_line = labels[num - 1]
-                    self.cur_subline = -1  # the main loop will increment it
+                    self.stmt_ptr.jump(labels[num - 1])
 
             case ("print", *exprs):
                 newline = True
