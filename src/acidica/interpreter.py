@@ -166,6 +166,8 @@ class Interpreter:
                 self.set_var(var, val)
 
             case ("goto", line_num):
+                if line_num not in self.program.lines:
+                    self.error(f"Bad GOTO target {line_num}")
                 self.cur_line = line_num
                 self.cur_subline = -1  # the main loop will increment it
 

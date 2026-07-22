@@ -78,6 +78,20 @@ TEST_PROGRAMS = [
         """,
         "hello\n 6 \n",
     ),
+    # GOTO targets must be correct
+    program(
+        """
+        10 GOTO 1000
+        """,
+        error="!Bad GOTO target 1000 on line 10",
+    ),
+    program(
+        """
+        10 GOTO 20
+        30 PRINT "Hello"
+        """,
+        error="!Bad GOTO target 20 on line 10",
+    ),
     # Arithmetic
     program(
         """
