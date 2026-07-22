@@ -426,6 +426,14 @@ TEST_PROGRAMS = [
         Goodbye, 34, 2.71828
         """,
     ),
+    program(
+        """
+        10 Input "Elements"; a(2), a(4)
+        20 Print "elements:"; a(0); a(1); a(2); a(3); a(4); a(5); "."
+        """,
+        "Elements? \nelements: 0  0  17  0  23  0 .\n",
+        input="17, 23\n",
+    ),
     # Input errors
     program(
         "10 INPUT",
@@ -518,6 +526,12 @@ TEST_PROGRAMS = [
         rnd(1): 0.19236379  0.19236379 .
         rnd(-1): 0.13436424  0.84743374  0.84743374 .
         """,
+    ),
+    program(
+        """
+        10 print abs + 1
+        """,
+        error="!Syntax error on line 10: '+'",
     ),
     program(
         """
@@ -850,6 +864,14 @@ TEST_PROGRAMS = [
         30 print "the data:"; x; y; "x"; s$; "."
         """,
         error="!Out of data on line 10",
+    ),
+    program(
+        """
+        10 read a(2), a(4)
+        20 Print "elements:"; a(0); a(1); a(2); a(3); a(4); a(5); "."
+        30 data 17, 23
+        """,
+        "elements: 0  0  17  0  23  0 .\n",
     ),
 ]
 

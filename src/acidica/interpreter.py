@@ -136,6 +136,8 @@ class Interpreter:
         raise AcidicaError(msg)
 
     def get_var(self, var, *args):
+        if args and not var.endswith("("):
+            var += "("
         value = self.variables.get(var)
         if value is None:
             value = var_type(var)()
@@ -149,6 +151,8 @@ class Interpreter:
         return value
 
     def set_var(self, var, val, *args):
+        if args and not var.endswith("("):
+            var += "("
         vtype = var_type(var)
         if vtype is int and isinstance(val, float):
             val = float2int(val)
@@ -169,10 +173,11 @@ class Interpreter:
                 pass
 
             case ("dim", var, *args):
-                var = var + "("
+                assert args
+                var += "("
                 if var in self.variables:
                     self.error("Redim'd array")
-                args = [float2int(self.eval(a)) for a in args]
+                args = self.eval_var_args(args)
                 self.variables[var] = Array(args, var_type(var)())
 
             case ("end",):
@@ -215,7 +220,8 @@ class Interpreter:
                             break
                     if len(vals) > len(vars):
                         self.io.print("!Extra input ignored")
-                    for var, val in zip(vars, vals):
+                    for (kind, var, *args), val in zip(vars, vals):
+                        assert kind == "var"
                         try:
                             val = var_type(var)(val)
                         except ValueError:
@@ -223,15 +229,12 @@ class Interpreter:
                             self.io.print("!Number expected - retry input line")
                             self.io.prompt("? ")
                             break
-                        self.set_var(var, val)
+                        self.set_var(var, val, *self.eval_var_args(args))
                     else:
                         break
 
-            case ("let", var, *args, expr):
-                args = [float2int(self.eval(a)) for a in args]
-                if args:
-                    var = var + "("
-                self.set_var(var, self.eval(expr), *args)
+            case ("let", ("var", var, *args), expr):
+                self.set_var(var, self.eval(expr), *self.eval_var_args(args))
 
             case ("next", var):
                 if var is not None:
@@ -275,7 +278,8 @@ class Interpreter:
                     self.io.print()
 
             case ("read", *vars):
-                for var in vars:
+                for (kind, var, *args) in vars:
+                    assert kind == "var"
                     if not self.cur_data:
                         while True:
                             stmt = self.data_ptr.stmt()
@@ -285,10 +289,13 @@ class Interpreter:
                                 self.cur_data = list(stmt[1:])
                                 break
                     val = var_type(var)(self.cur_data.pop(0))
-                    self.set_var(var, val)
+                    self.set_var(var, val, *self.eval_var_args(args))
 
             case _NEVER:
                 self.error(f"Unimplemented: {node}")
+
+    def eval_var_args(self, args):
+        return [float2int(self.eval(a)) for a in args]
 
     def eval(self, expr):
         try:
@@ -296,10 +303,7 @@ class Interpreter:
                 case ("value", value):
                     return value
                 case ("var", var, *args):
-                    args = [float2int(self.eval(a)) for a in args]
-                    if args:
-                        var = var + "("
-                    return self.get_var(var, *args)
+                    return self.get_var(var, *self.eval_var_args(args))
                 case ("+", e1, e2):
                     return self.eval(e1) + self.eval(e2)
                 case ("-", e1, e2):

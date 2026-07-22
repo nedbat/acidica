@@ -221,23 +221,20 @@ class Parser:
     def parse_let(self):
         var = self.tok.text
         self.eat()
-        if self.tok.kind == "lparen":
-            self.eat()
-            args = self.arg_list()
-        else:
-            args = []
+        args = self.arg_list()
         if self.tok != Token("op", "="):
             self.error()
         self.eat()
-        return ("let", var, *args, self.expr())
+        return ("let", ("var", var, *args), self.expr())
 
     def var_list(self):
         vars = []
         while True:
             if self.tok.kind != "var":
                 self.error()
-            vars.append(self.tok.text)
+            var = self.tok.text
             self.eat()
+            vars.append(("var", var, *self.arg_list()))
             if self.tok.kind != "comma":
                 break
             self.eat()
@@ -245,12 +242,14 @@ class Parser:
 
     def arg_list(self):
         args = []
-        while True:
-            args.append(self.expr())
-            if self.tok.kind == "rparen":
-                break
-            self.eat("comma")
-        self.eat("rparen")
+        if self.tok.kind == "lparen":
+            self.eat()
+            while True:
+                args.append(self.expr())
+                if self.tok.kind == "rparen":
+                    break
+                self.eat("comma")
+            self.eat("rparen")
         return args
 
     def prec9(self):
@@ -261,12 +260,7 @@ class Parser:
                 return ("value", tok.value())
             case Token("var", var):
                 self.eat()
-                if self.tok.kind == "lparen":
-                    self.eat()
-                    args = self.arg_list()
-                else:
-                    args = []
-                return ("var", var, *args)
+                return ("var", var, *self.arg_list())
             case Token("lparen", _):
                 self.eat()
                 node = self.expr()
@@ -274,9 +268,9 @@ class Parser:
                 return node
             case Token("fn", fn):
                 self.eat()
-                self.eat("lparen")
-                args = self.arg_list()
-                return ("fn", fn, *args)
+                if self.tok.kind != "lparen":
+                    self.error()
+                return ("fn", fn, *self.arg_list())
 
     def prec8(self):
         match self.tok:
