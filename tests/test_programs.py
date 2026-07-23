@@ -905,6 +905,37 @@ TEST_PROGRAMS = [
         nums: 3  99 .
         """,
     ),
+    # Labels must be positive integers
+    program(
+        """
+        10.5 Print "What"
+        """,
+        error="!Bad label: '10.5'",
+    ),
+    program(
+        """
+        10 GO TO 3.141
+        """,
+        error="!Bad label on line 10: '3.141'",
+    ),
+    program(
+        """
+        10 GO TO -10
+        """,
+        error="!Syntax error on line 10: '-'",
+    ),
+    program(
+        """
+        10 IF 1=1 THEN 3.14
+        """,
+        error="!Bad label on line 10: '3.14'",
+    ),
+    program(
+        """
+        10 ON X GOTO 3.14
+        """,
+        error="!Bad label on line 10: '3.14'",
+    ),
 ]
 
 EXAMPLES = [

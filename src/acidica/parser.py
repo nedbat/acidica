@@ -45,7 +45,7 @@ class Parser:
                 continue
             if self.tok.kind != "num":
                 self.error("No line number", line_num=False)
-            self.line_num = self.tok.value()
+            self.line_num = self.label(line_num=False)
 
             if self.line_num in lines:
                 self.error(
@@ -54,7 +54,6 @@ class Parser:
                     line_num=False,
                 )
 
-            self.eat()
             lines[self.line_num] = line = []
 
             while True:
@@ -122,11 +121,7 @@ class Parser:
                         match self.tok:
                             case Token("key", "TO"):
                                 self.eat()
-                                if self.tok.kind != "num":
-                                    self.error()
-                                # TODO: what about floats?
-                                line.append(("goto", self.tok.value()))
-                                self.eat()
+                                line.append(("goto", self.label()))
                             case _:
                                 self.error()
 
@@ -136,8 +131,7 @@ class Parser:
                         self.eat_key("THEN")
                         line.append(("if", cond))
                         if self.tok.kind == "num":
-                            line.append(("goto", self.tok.value()))
-                            self.eat()
+                            line.append(("goto", self.label()))
 
                     case Token("key", "INPUT"):
                         self.eat()
@@ -177,10 +171,7 @@ class Parser:
                             self.error()
                         labels = []
                         while True:
-                            if self.tok.kind != "num":
-                                self.error()
-                            labels.append(self.tok.value())
-                            self.eat()
+                            labels.append(self.label())
                             if self.tok.kind != "comma":
                                 break
                             self.eat()
@@ -209,10 +200,8 @@ class Parser:
 
                     case Token("key", "RESTORE"):
                         self.eat()
-                        # TODO: what about floats?
                         if self.tok.kind == "num":
-                            label = self.tok.value()
-                            self.eat()
+                            label = self.label()
                         else:
                             label = 0
                         line.append(("restore", label))
@@ -228,6 +217,15 @@ class Parser:
                         self.error()
 
         return Program(lines)
+
+    def label(self, **kwargs):
+        if self.tok.kind != "num":
+            self.error()
+        label = self.tok.value()
+        if not isinstance(label, int) or label < 0:
+            self.error("Bad label", **kwargs)
+        self.eat()
+        return label
 
     def parse_let(self):
         var = self.tok.text
