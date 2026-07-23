@@ -68,9 +68,6 @@ class Parser:
                         line.append(("data", *parse_data(data)))
                         self.eat()
 
-                    case Token("key", "DATA"):
-                        pass
-
                     case Token("key", "DIM"):
                         self.eat()
                         while True:
