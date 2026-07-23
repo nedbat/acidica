@@ -943,6 +943,46 @@ TEST_PROGRAMS = [
         """,
         error="!Bad label on line 10: '3.14'",
     ),
+    # GOSUB / RETURN
+    program(
+        """
+        10 print "Start"
+        20 gosub 100: print "back"
+        30 print "another"
+        40 go sub 100
+        50 print "done": end
+        100 print "sub"
+        110 return
+        """,
+        """
+        Start
+        sub
+        back
+        another
+        sub
+        done
+        """,
+    ),
+    program(
+        """
+        10 GOSUB 1000
+        """,
+        error="!Bad GOSUB target 1000 on line 10",
+    ),
+    program(
+        """
+        10 return
+        """,
+        error="!RETURN without GOSUB on line 10",
+    ),
+    program(
+        """
+        10 gosub 20
+        20 gosub 30
+        30 return
+        """,
+        error="!RETURN without GOSUB on line 30",
+    ),
 ]
 
 EXAMPLES = [

@@ -122,6 +122,9 @@ class Parser:
                             case Token("key", "TO"):
                                 self.eat()
                                 line.append(("goto", self.label()))
+                            case Token("key", "SUB"):
+                                self.eat()
+                                line.append(("gosub", self.label()))
                             case _:
                                 self.error()
 
@@ -205,6 +208,10 @@ class Parser:
                         else:
                             label = 0
                         line.append(("restore", label))
+
+                    case Token("key", "RETURN"):
+                        self.eat()
+                        line.append(("return",))
 
                     case Token("key", "STOP"):
                         self.eat()

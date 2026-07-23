@@ -70,9 +70,9 @@ class Array:
 
 
 class StatementPointer:
-    def __init__(self, program):
+    def __init__(self, program, label=None):
         self.program = program
-        self.jump(self.program.first)
+        self.jump(label or self.program.first)
 
     def stmt(self):
         while True:
@@ -117,6 +117,7 @@ class Interpreter:
         self.io = InOut(outstream, instream)
         self.running = True
         self.stmt_ptr = StatementPointer(self.program)
+        self.call_stack = []
         self.variables = {}
         self.loops = []
         self.random = random.Random(314159)
@@ -200,6 +201,12 @@ class Interpreter:
                     self.error(f"Bad GOTO target {line_num}")
                 self.stmt_ptr.jump(line_num)
 
+            case ("gosub", line_num):
+                if line_num not in self.program.lines:
+                    self.error(f"Bad GOSUB target {line_num}")
+                self.call_stack.append(self.stmt_ptr)
+                self.stmt_ptr = StatementPointer(self.program, line_num)
+
             case ("if", cond):
                 cond = self.eval(cond)
                 if isinstance(cond, str):
@@ -278,7 +285,7 @@ class Interpreter:
                     self.io.print()
 
             case ("read", *vars):
-                for (kind, var, *args) in vars:
+                for kind, var, *args in vars:
                     assert kind == "var"
                     if not self.cur_data:
                         while True:
@@ -297,6 +304,11 @@ class Interpreter:
                     self.error(f"Bad RESTORE target {label}")
                 self.data_ptr.jump(label)
                 self.cur_data = []
+
+            case ("return",):
+                if not self.call_stack:
+                    self.error("RETURN without GOSUB")
+                self.stmt_ptr = self.call_stack.pop()
 
             case _NEVER:
                 self.error(f"Unimplemented: {node}")
