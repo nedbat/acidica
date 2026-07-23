@@ -292,7 +292,10 @@ class Interpreter:
                     self.set_var(var, val, *self.eval_var_args(args))
 
             case ("restore", label):
-                self.data_ptr.jump(label or self.program.first)
+                label = label or self.program.first
+                if label not in self.program.lines:
+                    self.error(f"Bad RESTORE target {label}")
+                self.data_ptr.jump(label)
                 self.cur_data = []
 
             case _NEVER:

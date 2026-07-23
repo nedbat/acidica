@@ -905,6 +905,13 @@ TEST_PROGRAMS = [
         nums: 3  99 .
         """,
     ),
+    program(
+        """
+        10 data 1, 2, 3
+        20 restore 30
+        """,
+        error="!Bad RESTORE target 30 on line 20",
+    ),
     # Labels must be positive integers
     program(
         """
