@@ -17,8 +17,9 @@ def main():
         """)
     try:
         prog = Parser(source).parse()
-        pprint.pprint(prog.lines)
-        print("-" * 40)
+        if 1:
+            pprint.pprint(prog.lines)
+            print("-" * 40)
         Interpreter(prog, sys.stdin, sys.stdout).run()
     except AcidicaError as e:
         print(str(e))

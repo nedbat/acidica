@@ -70,20 +70,24 @@ class Array:
 
 
 class StatementPointer:
-    def __init__(self, program, label=None):
+    def __init__(self, program, kind, label=None):
         self.program = program
+        self.kind = kind
         self.jump(label or self.program.first)
 
     def stmt(self):
         while True:
             if self.line_num is None:
                 return None
-            line = self.program.lines[self.line_num]
+            line_num, subline = self.line_num, self.subline
+            line = self.program.lines[line_num]
             if self.subline >= len(line):
                 self.next_line()
                 continue
             stmt = line[self.subline]
             self.subline += 1
+            # if self.kind == "run":
+            #     print(f"RUN {line_num}.{subline}: {stmt}")
             return stmt
 
     def next_line(self):
@@ -94,7 +98,7 @@ class StatementPointer:
         self.subline = 0
 
     def copy(self):
-        sp = StatementPointer(self.program)
+        sp = StatementPointer(self.program, self.kind)
         sp.line_num = self.line_num
         sp.subline = self.subline
         return sp
@@ -116,13 +120,13 @@ class Interpreter:
         self.program = program
         self.io = InOut(outstream, instream)
         self.running = True
-        self.stmt_ptr = StatementPointer(self.program)
+        self.stmt_ptr = StatementPointer(self.program, "run")
         self.call_stack = []
         self.variables = {}
         self.loops = []
         self.random = random.Random(314159)
         self.last_rnd = 0
-        self.data_ptr = StatementPointer(self.program)
+        self.data_ptr = StatementPointer(self.program, "data")
         self.cur_data = []
 
     def run(self):
@@ -149,11 +153,13 @@ class Interpreter:
         else:
             if isinstance(value, Array):
                 value = value.get(self.error, *args)
+        # print(f"GET {var}{args}: {value!r}")
         return value
 
     def set_var(self, var, val, *args):
         if args and not var.endswith("("):
             var += "("
+        # print(f"SET {var}{args} = {val!r}")
         vtype = var_type(var)
         if vtype is int and isinstance(val, float):
             val = float2int(val)
@@ -205,7 +211,7 @@ class Interpreter:
                 if line_num not in self.program.lines:
                     self.error(f"Bad GOSUB target {line_num}")
                 self.call_stack.append(self.stmt_ptr)
-                self.stmt_ptr = StatementPointer(self.program, line_num)
+                self.stmt_ptr = StatementPointer(self.program, "run", line_num)
 
             case ("if", cond):
                 cond = self.eval(cond)
