@@ -983,6 +983,16 @@ TEST_PROGRAMS = [
         """,
         error="!RETURN without GOSUB on line 30",
     ),
+    # More tests
+    program(
+        """
+        100 print "nums:";
+        120 FOR I=0 TO 4: READ B(I): print b(i);: NEXT I
+        130 data 2, 21, 14, 14, 25
+        140 print "."
+        """,
+        "nums: 2  21  14  14  25 .\n",
+    ),
 ]
 
 EXAMPLES = [

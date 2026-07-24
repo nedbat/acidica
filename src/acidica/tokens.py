@@ -76,7 +76,7 @@ def tokenize(text: str) -> Iterator[Token]:
             yield Token(kind, text)
 
 
-DATA_TOKENS = r'(\s*"[^"]*")|(\s*[^",][^,]+)'
+DATA_TOKENS = r'\s*("[^"]*")|([^",][^,]*)'
 
 
 def parse_data(line):
