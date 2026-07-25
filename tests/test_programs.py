@@ -1030,6 +1030,27 @@ TEST_PROGRAMS = [
     ),
     program(
         """
+        10 let G = 1000
+        20 def fn more(x) = G + x
+        30 print "more:"; fnmo(234); "."
+        40 def fn less(g, x) = fnmo(x)
+        50 print "less:"; fnle(100, 23); "."
+        """,
+        """
+        more: 1234 .
+        less: 123 .
+        """,
+    ),
+    program(
+        """
+        20 def fn a(x) = x * x + 1
+        30 dim b(1)
+        40 print "look:"; fna(b); "."
+        """,
+        "look: 1 .\n",
+    ),
+    program(
+        """
         20 print fn z(10)
         """,
         error="!Undefined function Z on line 20",
