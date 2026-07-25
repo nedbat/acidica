@@ -261,7 +261,7 @@ class Interpreter:
                     while self.loops and self.loops[-1].var != var:
                         self.loops.pop()
                 if not self.loops:
-                    self.error("No matching loop found")
+                    self.error("NEXT without FOR error")
                 loop = self.loops[-1]
                 loop.val += loop.step
                 if loop.step > 0:

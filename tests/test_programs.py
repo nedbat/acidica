@@ -370,14 +370,14 @@ TEST_PROGRAMS = [
         """
         10 next i
         """,
-        error="!No matching loop found on line 10",
+        error="!NEXT without FOR error on line 10",
     ),
     program(
         """
         10 for i = 1 to 10
         20 next j
         """,
-        error="!No matching loop found on line 20",
+        error="!NEXT without FOR error on line 20",
     ),
     program(
         "10 for x$ = 1 to 10",
