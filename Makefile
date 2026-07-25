@@ -13,6 +13,6 @@ test:
 .PHONY: clean
 
 clean:
-	rm -rf .coverage htmlcov
+	rm -rf .coverage .coverage.* htmlcov
 	rm -rf build
 	rm -rf src/acidica.egg-info
