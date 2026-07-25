@@ -785,6 +785,12 @@ TEST_PROGRAMS = [
         """,
         error="!Redim'd array on line 110",
     ),
+    program(
+        """
+        10 DIM A(-1)
+        """,
+        error="!Negative array dim on line 10",
+    ),
     # On GOTO
     program(
         """

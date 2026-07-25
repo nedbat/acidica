@@ -44,29 +44,32 @@ def print_repr(value):
 class Array:
     """A multi-dimensional array."""
 
-    def __init__(self, dims: Iterable[int], default: Any):
+    def __init__(self, errfn, dims: Iterable[int], default: Any):
+        self.errfn = errfn
         self.dims = tuple(dims)
+        if any(d < 1 for d in self.dims):
+            self.errfn("Negative array dim")
         self.default = default
         self.data: dict[tuple[int, ...], Any] = {}
 
     def __repr__(self):
         return f"Array({','.join(map(str, self.dims))})"
 
-    def check_args(self, errfn, *args):
+    def check_args(self, *args):
         if len(args) != len(self.dims):
-            errfn("Mismatched array dimensions")
+            self.errfn("Mismatched array dimensions")
         if any(a < 0 for a in args):
-            errfn("Negative array index")
+            self.errfn("Negative array index")
         for a, d in zip(args, self.dims):
             if a > d:
-                errfn("Out of array bounds")
+                self.errfn("Out of array bounds")
 
-    def get(self, errfn, *args):
-        self.check_args(errfn, *args)
+    def get(self, *args):
+        self.check_args(*args)
         return self.data.get(args, self.default)
 
-    def set(self, errfn, val, *args):
-        self.check_args(errfn, *args)
+    def set(self, val, *args):
+        self.check_args(*args)
         self.data[args] = val
 
 
@@ -149,11 +152,11 @@ class Interpreter:
             value = var_type(var)()
             if args:
                 # Default array is indexed 0..10
-                self.variables[var] = Array([10], value)
+                self.variables[var] = Array(self.error, [10], value)
             self.set_var(var, value, *args)
         else:
             if isinstance(value, Array):
-                value = value.get(self.error, *args)
+                value = value.get(*args)
         # print(f"GET {var}{args}: {value!r}")
         return value
 
@@ -170,8 +173,8 @@ class Interpreter:
             self.error(f"Incorrect type: can't assign {val!r} to {var}")
         if args:
             if var not in self.variables:
-                self.variables[var] = Array([10], vtype())
-            self.variables[var].set(self.error, val, *args)
+                self.variables[var] = Array(self.error, [10], vtype())
+            self.variables[var].set(val, *args)
         else:
             self.variables[var] = val
 
@@ -189,7 +192,7 @@ class Interpreter:
                 if var in self.variables:
                     self.error("Redim'd array")
                 args = self.eval_var_args(args)
-                self.variables[var] = Array(args, var_type(var)())
+                self.variables[var] = Array(self.error, args, var_type(var)())
 
             case ("end",):
                 self.running = False
