@@ -17,7 +17,7 @@ def main():
         """)
     try:
         prog = Parser(source).parse()
-        if 1:
+        if 0:
             pprint.pprint(prog.lines)
             print("-" * 40)
         Interpreter(prog, sys.stdin, sys.stdout).run()
