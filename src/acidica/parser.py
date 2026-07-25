@@ -279,11 +279,11 @@ class Parser:
                 node = self.expr()
                 self.eat("rparen")
                 return node
-            case Token("fn", fn):
+            case Token("builtin", fn):
                 self.eat()
                 if self.tok.kind != "lparen":
                     self.error()
-                return ("fn", fn, *self.arg_list())
+                return ("builtin", fn, *self.arg_list())
 
     def prec8(self):
         match self.tok:

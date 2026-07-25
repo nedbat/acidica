@@ -48,7 +48,7 @@ TOKENS = rf"""(?xmi)
     (?P<colon>:)                                        |
     (?P<semicolon>;)                                    |
     (?P<key>{KEYWORDS}|\?)                              |
-    (?P<fn>{FUNCTIONS})                                 |
+    (?P<builtin>{FUNCTIONS})                            |
     (?P<op>-|\+|\^|\*|/|=|<>|<=|>=|<|>|{OPWORDS})       |
     (?P<var>[A-Z]+[0-9]*[$%]?)                          |
     (?P<num>[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)          |
@@ -64,7 +64,7 @@ def tokenize(text: str) -> Iterator[Token]:
         if m.lastgroup:
             kind = m.lastgroup
             text = m.group()
-            if kind in {"key", "fn", "var", "op"}:
+            if kind in {"key", "builtin", "var", "op"}:
                 text = text.upper()
             if kind == "var":
                 # Only the first two letters and the first digit are significant.

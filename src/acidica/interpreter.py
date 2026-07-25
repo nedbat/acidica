@@ -363,7 +363,7 @@ class Interpreter:
                     return bool2float(self.eval(e1) and self.eval(e2))
                 case ("or", e1, e2):
                     return bool2float(self.eval(e1) or self.eval(e2))
-                case ("fn", fn, *args):
+                case ("builtin", fn, *args):
                     args = [self.eval(a) for a in args]
                     return self.function(fn, *args)
                 case _NEVER:
