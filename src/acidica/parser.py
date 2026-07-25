@@ -71,19 +71,7 @@ class Parser:
                     case Token("key", "DIM"):
                         self.eat()
                         while True:
-                            if self.tok.kind != "var":
-                                self.error()
-                            var = self.tok.text
-                            self.eat()
-                            self.eat("lparen")
-                            dims = []
-                            while True:
-                                dims.append(self.expr())
-                                if self.tok.kind == "rparen":
-                                    self.eat()
-                                    break
-                                self.eat("comma")
-                            line.append(("dim", var, *dims))
+                            line.append(("dim", self.one_var()))
                             if self.tok.kind != "comma":
                                 break
                             self.eat()
@@ -243,15 +231,18 @@ class Parser:
     def var_list(self):
         vars = []
         while True:
-            if self.tok.kind != "var":
-                self.error()
-            var = self.tok.text
-            self.eat()
-            vars.append(("var", var, *self.arg_list()))
+            vars.append(self.one_var())
             if self.tok.kind != "comma":
                 break
             self.eat()
         return vars
+
+    def one_var(self):
+        if self.tok.kind != "var":
+            self.error()
+        var = self.tok.text
+        self.eat()
+        return ("var", var, *self.arg_list())
 
     def arg_list(self):
         args = []

@@ -179,7 +179,7 @@ class Interpreter:
             case ("data", *vals):
                 pass
 
-            case ("dim", var, *args):
+            case ("dim", ("var", var, *args)):
                 assert args
                 var += "("
                 if var in self.variables:
