@@ -993,6 +993,76 @@ TEST_PROGRAMS = [
         """,
         "nums: 2  21  14  14  25 .\n",
     ),
+    # DEF FN
+    program(
+        """
+        10 def fn a(x) = x * x + 1
+        20 print "a(10) ="; fn a(10); "."
+        """,
+        "a(10) = 101 .\n",
+    ),
+    program(
+        """
+        10 x = 1000
+        20 def fn a(x) = x * x + 1
+        30 print "a(10) ="; fn a(10); "."
+        40 print "x ="; x; "."
+        """,
+        """
+        a(10) = 101 .
+        x = 1000 .
+        """,
+    ),
+    program(
+        """
+        10 x = 1000
+        20 def fn a(x) = x * x + 1
+        30 def fn b(x) = fna(x) + fna(123) + x
+        40 print "b(10) ="; fn b(10); "."
+        50 print "a(10) ="; fn a(10); "."
+        60 print "x ="; x; "."
+        """,
+        """
+        b(10) = 15241 .
+        a(10) = 101 .
+        x = 1000 .
+        """,
+    ),
+    program(
+        """
+        20 print fn z(10)
+        """,
+        error="!Undefined function Z on line 20",
+    ),
+    program(
+        """
+        10 def fn a(x) = x * x + 1
+        20 print "a(10) ="; fn a(10, 10); "."
+        """,
+        "a(10) =",
+        error="!Wrong number of arguments for function A on line 20",
+    ),
+    program(
+        """
+        20 def fn a(x) = x * x + 1
+        30 def fn b(x) = a(x) + a(123) + x
+        40 print "b(10) ="; fn b(10); "."
+        """,
+        "b(10) =",
+        error="!Out of array bounds on line 40",
+    ),
+    program(
+        """
+        10 def something
+        """,
+        error="!Syntax error on line 10: 'SO'",
+    ),
+    program(
+        """
+        20 def fn a(x) x * x + 1
+        """,
+        error="!Syntax error on line 20: 'X'",
+    ),
 ]
 
 EXAMPLES = [

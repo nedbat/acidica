@@ -68,6 +68,17 @@ class Parser:
                         line.append(("data", *parse_data(data)))
                         self.eat()
 
+                    case Token("key", "DEF"):
+                        self.eat()
+                        if self.tok != Token("key", "FN"):
+                            self.error()
+                        self.eat()
+                        var = self.one_var()
+                        if self.tok != Token("op", "="):
+                            self.error()
+                        self.eat()
+                        line.append(("def", var, self.expr()))
+
                     case Token("key", "DIM"):
                         self.eat()
                         while True:
@@ -275,6 +286,9 @@ class Parser:
                 if self.tok.kind != "lparen":
                     self.error()
                 return ("builtin", fn, *self.arg_list())
+            case Token("key", "FN"):
+                self.eat()
+                return ("fn", self.one_var())
 
     def prec8(self):
         match self.tok:

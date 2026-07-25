@@ -179,6 +179,9 @@ class Interpreter:
             case ("data", *vals):
                 pass
 
+            case ("def", ("var", var, *args), expr):
+                self.variables[var + "@"] = (args, expr)
+
             case ("dim", ("var", var, *args)):
                 assert args
                 var += "("
@@ -366,6 +369,25 @@ class Interpreter:
                 case ("builtin", fn, *args):
                     args = [self.eval(a) for a in args]
                     return self.function(fn, *args)
+                case ("fn", ("var", var, *args)):
+                    fndef = self.variables.get(var + "@")
+                    if fndef is None:
+                        self.error(f"Undefined function {var}")
+                    formals, expr = fndef
+                    if len(formals) != len(args):
+                        self.error(f"Wrong number of arguments for function {var}")
+                    args = self.eval_var_args(args)
+                    saved = {}
+                    for (kind, var), val in zip(formals, args):
+                        assert kind == "var"
+                        saved[var] = self.variables.get(var)
+                        self.set_var(var, val)
+                    ret = self.eval(expr)
+                    for _, var in formals:
+                        val = saved[var]
+                        if val is not None:
+                            self.variables[var] = val
+                    return ret
                 case _NEVER:
                     self.error(f"Unimplemented: {expr}")
         except TypeError:
