@@ -1,6 +1,7 @@
 import dataclasses
 import math
 import random
+import time
 from typing import Any, Iterable, Never
 
 from .exceptions import AcidicaError
@@ -292,6 +293,9 @@ class Interpreter:
                             newline = True
                 if newline:
                     self.io.print()
+
+            case ("randomize",):
+                self.random.seed(time.time())
 
             case ("read", *vars):
                 for kind, var, *args in vars:

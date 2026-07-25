@@ -1084,6 +1084,25 @@ TEST_PROGRAMS = [
         """,
         error="!Syntax error on line 20: 'X'",
     ),
+    # RANDOMIZE
+    program(
+        """
+        10 REM How to test RANDOMIZE?
+        20 def fn r(r) = INT(RND(r) * 100000000): REM Random num to 100M
+        30 print "unseeded:"; fnr(1); fnr(1); fnr(0); "."
+        40 print "seeded:"; fnr(-3); fnr(0); fnr(0); "."
+        50 s = rnd(-3): t = rnd(-4)
+        60 randomize
+        70 u = rnd(1)
+        80 if s <> t and t <> u and s <> u then print "all good"
+        90 if s = t or t = u or s = u then print "bad"
+        """,
+        """
+        unseeded: 19236379  28684245  28684245 .
+        seeded: 23796462  23796462  23796462 .
+        all good
+        """,
+    ),
 ]
 
 EXAMPLES = [

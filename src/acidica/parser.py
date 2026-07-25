@@ -193,6 +193,10 @@ class Parser:
                                     items.append(item)
                         line.append(("print", *items))
 
+                    case Token("key", "RANDOMIZE"):
+                        self.eat()
+                        line.append(("randomize",))
+
                     case Token("key", "READ"):
                         self.eat()
                         line.append(("read", *self.var_list()))
