@@ -79,8 +79,8 @@ class StatementPointer:
         while True:
             if self.line_num is None:
                 return None
-            line_num, subline = self.line_num, self.subline
-            line = self.program.lines[line_num]
+            # line_num, subline = self.line_num
+            line = self.program.lines[self.line_num]
             if self.subline >= len(line):
                 self.next_line()
                 continue
