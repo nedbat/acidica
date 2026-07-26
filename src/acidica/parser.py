@@ -166,6 +166,9 @@ class Parser:
                         if self.tok == Token("key", "TO"):
                             self.eat()
                             op = "ongoto"
+                        elif self.tok == Token("key", "SUB"):
+                            self.eat()
+                            op = "ongosub"
                         else:
                             self.error()
                         labels = []

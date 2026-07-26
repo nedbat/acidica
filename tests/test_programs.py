@@ -826,6 +826,13 @@ TEST_PROGRAMS = [
         """,
         error="!Syntax error on line 10: 'TH'",
     ),
+    program(
+        """
+        10 x = 2
+        20 on x goto 100, 999, 300
+        """,
+        error="!Bad ON GOTO target 999 on line 20",
+    ),
     # DATA
     program(
         """
@@ -988,6 +995,38 @@ TEST_PROGRAMS = [
         30 return
         """,
         error="!RETURN without GOSUB on line 30",
+    ),
+    # ON GOSUB
+    program(
+        """
+        10 for x = 1 to 3: on x gosub 100, 200, 300: next x
+        20 print "done"
+        30 end
+        100 print "One": return
+        200 print "Two": return
+        300 print "Three": return
+        """,
+        """
+        One
+        Two
+        Three
+        done
+        """,
+    ),
+    program(
+        """
+        10 x = 10
+        20 on x gosub 100, 200, 300
+        30 print "Nothing"
+        """,
+        "Nothing\n",
+    ),
+    program(
+        """
+        10 x =  2
+        20 on x gosub 100, 999, 300
+        """,
+        error="!Bad ON GOSUB target 999 on line 20",
     ),
     # More tests
     program(

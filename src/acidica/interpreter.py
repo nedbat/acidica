@@ -209,16 +209,16 @@ class Interpreter:
                 self.loops.append(loop)
                 self.set_var(var, val)
 
-            case ("goto", line_num):
-                if line_num not in self.program.lines:
-                    self.error(f"Bad GOTO target {line_num}")
-                self.stmt_ptr.jump(line_num)
-
             case ("gosub", line_num):
                 if line_num not in self.program.lines:
                     self.error(f"Bad GOSUB target {line_num}")
                 self.call_stack.append(self.stmt_ptr)
                 self.stmt_ptr = StatementPointer(self.program, "run", line_num)
+
+            case ("goto", line_num):
+                if line_num not in self.program.lines:
+                    self.error(f"Bad GOTO target {line_num}")
+                self.stmt_ptr.jump(line_num)
 
             case ("if", cond):
                 cond = self.eval(cond)
@@ -274,10 +274,22 @@ class Interpreter:
                 else:
                     self.loops.pop()
 
+            case ("ongosub", expr, *labels):
+                num = float2int(self.eval(expr))
+                if 1 <= num <= len(labels):
+                    line_num = labels[num - 1]
+                    if line_num not in self.program.lines:
+                        self.error(f"Bad ON GOSUB target {line_num}")
+                    self.call_stack.append(self.stmt_ptr)
+                    self.stmt_ptr = StatementPointer(self.program, "run", line_num)
+
             case ("ongoto", expr, *labels):
                 num = float2int(self.eval(expr))
                 if 1 <= num <= len(labels):
-                    self.stmt_ptr.jump(labels[num - 1])
+                    line_num = labels[num - 1]
+                    if line_num not in self.program.lines:
+                        self.error(f"Bad ON GOTO target {line_num}")
+                    self.stmt_ptr.jump(line_num)
 
             case ("print", *exprs):
                 newline = True
