@@ -234,7 +234,11 @@ TEST_PROGRAMS = [
     ),
     program(
         "10 LET X 24",
-        error="!Syntax error on line 10: '24'",
+        error="!Expected =, saw 24 on line 10",
+    ),
+    program(
+        "10 LET X * 24",
+        error="!Expected =, saw * on line 10",
     ),
     program(
         """
@@ -334,11 +338,11 @@ TEST_PROGRAMS = [
     # Loop errors
     program(
         "10 for 12",
-        error="!Syntax error on line 10: '12'",
+        error="!Expected var, saw 12 on line 10",
     ),
     program(
         "10 for i 1 10",
-        error="!Syntax error on line 10: '1'",
+        error="!Expected =, saw 1 on line 10",
     ),
     program(
         "10 for i = 1 10",
@@ -437,7 +441,7 @@ TEST_PROGRAMS = [
     # Input errors
     program(
         "10 INPUT",
-        error="!Syntax error on line 10: saw eol",
+        error="!Expected var, saw eol on line 10",
     ),
     program(
         '10 INPUT "What"',
@@ -445,11 +449,11 @@ TEST_PROGRAMS = [
     ),
     program(
         '10 INPUT "What";',
-        error="!Syntax error on line 10: saw eol",
+        error="!Expected var, saw eol on line 10",
     ),
     program(
         '10 INPUT "What";x,',
-        error="!Syntax error on line 10: saw eol",
+        error="!Expected var, saw eol on line 10",
     ),
     program(
         '10 INPUT "What";x 12.34',
@@ -770,7 +774,7 @@ TEST_PROGRAMS = [
         """
         10 DIM 23
         """,
-        error="!Syntax error on line 10: '23'",
+        error="!Expected var, saw 23 on line 10",
     ),
     program(
         """
@@ -1121,13 +1125,13 @@ TEST_PROGRAMS = [
         """
         10 def something
         """,
-        error="!Syntax error on line 10: 'SO'",
+        error="!Expected FN, saw SO on line 10",
     ),
     program(
         """
         20 def fn a(x) x * x + 1
         """,
-        error="!Syntax error on line 20: 'X'",
+        error="!Expected =, saw X on line 20",
     ),
     # RANDOMIZE
     program(

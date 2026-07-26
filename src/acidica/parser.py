@@ -15,23 +15,23 @@ class Parser:
         if line_num:
             msg += f" on line {self.line_num}"
         if token:
-            if self.tok.text:
-                msg += f": '{self.tok.text}'"
-            else:
-                msg += f": saw {self.tok.kind}"
+            assert self.tok.text
+            msg += f": '{self.tok.text}'"
         raise AcidicaError(msg)
 
-    def eat(self, kind=None) -> None:
-        if kind is None or self.tok.kind == kind:
-            self.tok = next(self.toks)
-        else:
-            self.error(f"Expected {kind}, saw {self.tok.kind}", token=False)
-
-    def eat_key(self, text):
-        if self.tok.kind == "key" and self.tok.text == text:
-            self.tok = next(self.toks)
-        else:
-            self.error(f"Expected {text}, saw {self.tok.text}", token=False)
+    def eat(self, kind=None, text=None):
+        if kind is not None and self.tok.kind != kind:
+            self.error(
+                f"Expected {text or kind}, saw {self.tok.text or self.tok.kind}",
+                token=False,
+            )
+        elif text is not None and self.tok.text != text:
+            self.error(
+                f"Expected {text}, saw {self.tok.text or self.tok.kind}", token=False
+            )
+        text = self.tok.text
+        self.tok = next(self.toks)
+        return text
 
     def parse(self) -> Program:
         lines = {}
@@ -70,13 +70,9 @@ class Parser:
 
                     case Token("key", "DEF"):
                         self.eat()
-                        if self.tok != Token("key", "FN"):
-                            self.error()
-                        self.eat()
+                        self.eat("key", "FN")
                         var = self.one_var()
-                        if self.tok != Token("op", "="):
-                            self.error()
-                        self.eat()
+                        self.eat("op", "=")
                         line.append(("def", var, self.expr()))
 
                     case Token("key", "DIM"):
@@ -93,15 +89,10 @@ class Parser:
 
                     case Token("key", "FOR"):
                         self.eat()
-                        if self.tok.kind != "var":
-                            self.error()
-                        var = self.tok.text
-                        self.eat()
-                        if self.tok != Token("op", "="):
-                            self.error()
-                        self.eat()
+                        var = self.eat("var")
+                        self.eat("op", "=")
                         start = self.expr()
-                        self.eat_key("TO")
+                        self.eat("key", "TO")
                         end = self.expr()
                         if self.tok == Token("key", "STEP"):
                             self.eat()
@@ -127,7 +118,7 @@ class Parser:
                     case Token("key", "IF"):
                         self.eat()
                         cond = self.expr()
-                        self.eat_key("THEN")
+                        self.eat("key", "THEN")
                         line.append(("if", cond))
                         if self.tok.kind == "num":
                             line.append(("goto", self.label()))
@@ -162,7 +153,7 @@ class Parser:
                     case Token("key", "ON"):
                         self.eat()
                         expr = self.expr()
-                        self.eat_key("GO")
+                        self.eat("key", "GO")
                         if self.tok == Token("key", "TO"):
                             self.eat()
                             op = "ongoto"
@@ -241,9 +232,7 @@ class Parser:
         var = self.tok.text
         self.eat()
         args = self.arg_list()
-        if self.tok != Token("op", "="):
-            self.error()
-        self.eat()
+        self.eat("op", "=")
         return ("let", ("var", var, *args), self.expr())
 
     def var_list(self):
@@ -256,10 +245,7 @@ class Parser:
         return vars
 
     def one_var(self):
-        if self.tok.kind != "var":
-            self.error()
-        var = self.tok.text
-        self.eat()
+        var = self.eat("var")
         return ("var", var, *self.arg_list())
 
     def arg_list(self):
