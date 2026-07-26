@@ -10,6 +10,7 @@ dependencies = []
 dev = [
     "coverage>=7.15.0",
     "pytest>=9.1.1",
+    "pytest-cov>=7.1.0",
     "ty>=0.0.58",
 ]
 
@@ -24,4 +25,5 @@ exclude_also = [
 ]
 
 [tool.coverage.run]
-source = ["src", "tests"]
+branch = true
+core = "ctrace"

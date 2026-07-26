@@ -6,9 +6,9 @@ typecheck:
 .PHONY: test
 
 test:
-	coverage run --branch -m pytest
+	python -m pytest --cov=src --cov=tests --cov-context=test --cov-report=
 	coverage report --show-missing --skip-covered
-	coverage html
+	coverage html --show-contexts
 
 .PHONY: clean
 
