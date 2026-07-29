@@ -198,6 +198,8 @@ class Interpreter:
                 self.running = False
 
             case ("for", var, start, end, step):
+                if var_type(var) not in (int, float):
+                    self.error("Type mismatch")
                 val = self.eval(start)
                 loop = Loop(
                     var=var,

@@ -327,6 +327,7 @@ TEST_PROGRAMS = [
     ),
     program(
         """
+        5 REM this is different than Vintage BASIC which doesn't allow i% as a var
         10 print "Look:";
         20 for i% = 1.1 to 5.5 step 1.1
         30 print i%;
@@ -358,6 +359,18 @@ TEST_PROGRAMS = [
         """,
         error="!Syntax error on line 10: '3.14159'",
     ),
+    program(
+        """
+        10 for i = "A" to "Z"
+        """,
+        error="!Incorrect type: can't assign 'A' to I on line 10",
+    ),
+    program(
+        """
+        10 for i$ = "A" to "Z"
+        """,
+        error="!Type mismatch on line 10",
+    ),
     # Named NEXT
     program(
         """
@@ -385,7 +398,7 @@ TEST_PROGRAMS = [
     ),
     program(
         "10 for x$ = 1 to 10",
-        error="!Incorrect type: can't assign 1 to X$ on line 10",
+        error="!Type mismatch on line 10",
     ),
     # Input
     program(
