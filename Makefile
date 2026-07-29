@@ -3,6 +3,11 @@
 typecheck:
 	ty check src tests
 
+.PHONY: mypy
+
+mypy:
+	mypy  src tests
+
 .PHONY: test
 
 test:
