@@ -6,7 +6,7 @@ typecheck:
 .PHONY: mypy
 
 mypy:
-	mypy  src tests
+	mypy --strict src tests
 
 .PHONY: test
 

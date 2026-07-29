@@ -1,7 +1,7 @@
 from typing import Never
 
 from .exceptions import AcidicaError
-from .program import Program
+from .program import Ast, Program
 from .tokens import Token, parse_data, tokenize
 
 
@@ -9,17 +9,24 @@ class Parser:
     def __init__(self, text: str) -> None:
         self.toks = tokenize(text)
         self.tok = next(self.toks)
-        self.line_num = None
+        self.line_num: int | None = None
 
-    def error(self, msg="Syntax error", line_num=True, token=True) -> Never:
+    def error(
+        self,
+        msg: str = "Syntax error",
+        line_num: bool = True,
+        token: bool = True,
+    ) -> Never:
         if line_num:
             msg += f" on line {self.line_num}"
         if token:
-            assert self.tok.text
-            msg += f": '{self.tok.text}'"
+            if self.tok.text:
+                msg += f": '{self.tok.text}'"
+            else:
+                msg += f": {self.tok.kind}"
         raise AcidicaError(msg)
 
-    def eat(self, kind=None, text=None):
+    def eat(self, kind: str | None = None, text: str | None = None) -> str:
         if kind is not None and self.tok.kind != kind:
             self.error(
                 f"Expected {text or kind}, saw {self.tok.text or self.tok.kind}",
@@ -34,7 +41,7 @@ class Parser:
         return text
 
     def parse(self) -> Program:
-        lines = {}
+        lines: dict[int, list[Ast]] = {}
         while True:
             # Start of a line: need a line number
             if self.tok.kind == "eol":
@@ -54,7 +61,8 @@ class Parser:
                     line_num=False,
                 )
 
-            lines[self.line_num] = line = []
+            line: list[Ast] = []
+            lines[self.line_num] = line
 
             while True:
                 match self.tok:
@@ -89,7 +97,7 @@ class Parser:
 
                     case Token("key", "FOR"):
                         self.eat()
-                        var = self.eat("var")
+                        for_var = self.eat("var")
                         self.eat("op", "=")
                         start = self.expr()
                         self.eat("key", "TO")
@@ -101,7 +109,7 @@ class Parser:
                                 self.error()
                         else:
                             step = ("value", 1)
-                        line.append(("for", var, start, end, step))
+                        line.append(("for", for_var, start, end, step))
 
                     case Token("key", "GO"):
                         self.eat()
@@ -143,12 +151,11 @@ class Parser:
 
                     case Token("key", "NEXT"):
                         self.eat()
+                        next_var: str | None = None
                         if self.tok.kind == "var":
-                            var = self.tok.text
+                            next_var = self.tok.text
                             self.eat()
-                        else:
-                            var = None
-                        line.append(("next", var))
+                        line.append(("next", next_var))
 
                     case Token("key", "ON"):
                         self.eat()
@@ -219,23 +226,27 @@ class Parser:
 
         return Program(lines)
 
-    def label(self, **kwargs):
+    def label(
+        self,
+        line_num: bool = True,
+        token: bool = True,
+    ) -> int:
         if self.tok.kind != "num":
             self.error()
         label = self.tok.value()
         if not isinstance(label, int) or label < 0:
-            self.error("Bad label", **kwargs)
+            self.error("Bad label", line_num, token)
         self.eat()
         return label
 
-    def parse_let(self):
+    def parse_let(self) -> Ast:
         var = self.tok.text
         self.eat()
         args = self.arg_list()
         self.eat("op", "=")
         return ("let", ("var", var, *args), self.expr())
 
-    def var_list(self):
+    def var_list(self) -> list[Ast]:
         vars = []
         while True:
             vars.append(self.one_var())
@@ -244,11 +255,11 @@ class Parser:
             self.eat()
         return vars
 
-    def one_var(self):
+    def one_var(self) -> Ast:
         var = self.eat("var")
         return ("var", var, *self.arg_list())
 
-    def arg_list(self):
+    def arg_list(self) -> list[Ast]:
         args = []
         if self.tok.kind == "lparen":
             self.eat()
@@ -260,7 +271,7 @@ class Parser:
             self.eat("rparen")
         return args
 
-    def prec9(self):
+    def prec9(self) -> Ast:
         tok = self.tok
         match tok:
             case Token("num", _) | Token("str", _):
@@ -282,8 +293,10 @@ class Parser:
             case Token("key", "FN"):
                 self.eat()
                 return ("fn", self.one_var())
+            case _NEVER:
+                self.error()
 
-    def prec8(self):
+    def prec8(self) -> Ast:
         match self.tok:
             case Token("op", "-"):
                 self.eat()
@@ -294,7 +307,7 @@ class Parser:
             case _:
                 return self.prec9()
 
-    def prec7(self):
+    def prec7(self) -> Ast:
         # ^ associates to the right
         node = self.prec8()
         more = [node]
@@ -308,7 +321,7 @@ class Parser:
             more.append(node)
         return more[0]
 
-    def prec6(self):
+    def prec6(self) -> Ast:
         node = self.prec7()
         while self.tok.kind == "op" and self.tok.text in {"*", "/"}:
             op = self.tok.text
@@ -316,7 +329,7 @@ class Parser:
             node = (op, node, self.prec7())
         return node
 
-    def prec5(self):
+    def prec5(self) -> Ast:
         node = self.prec6()
         while self.tok.kind == "op" and self.tok.text in {"+", "-"}:
             op = self.tok.text
@@ -324,7 +337,7 @@ class Parser:
             node = (op, node, self.prec6())
         return node
 
-    def prec4(self):
+    def prec4(self) -> Ast:
         node = self.prec5()
         while self.tok.kind == "op" and self.tok.text in {
             "=",
@@ -339,7 +352,7 @@ class Parser:
             node = (op, node, self.prec5())
         return node
 
-    def prec3(self):
+    def prec3(self) -> Ast:
         match self.tok:
             case Token("op", "NOT"):
                 self.eat()
@@ -347,14 +360,14 @@ class Parser:
             case _:
                 return self.prec4()
 
-    def prec2(self):
+    def prec2(self) -> Ast:
         node = self.prec3()
         while self.tok.kind == "op" and self.tok.text == "AND":
             self.eat()
             node = ("and", node, self.prec3())
         return node
 
-    def prec1(self):
+    def prec1(self) -> Ast:
         node = self.prec2()
         while self.tok.kind == "op" and self.tok.text == "OR":
             self.eat()

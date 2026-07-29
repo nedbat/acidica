@@ -2,14 +2,20 @@ import dataclasses
 import math
 import random
 import time
-from typing import Any, Iterable, Never
+from typing import Any, Callable, TextIO, Iterable, Never
 
 from .exceptions import AcidicaError
 from .inout import InOut
+from .program import Ast, Program
 from .tokens import parse_data
 
 
-def var_type(var: str):
+# Actually: `int | float | str`, but eval() is too dynamic, so punt.
+type BasicVal = Any 
+type BasicValOrArray = Any
+
+
+def var_type(var: str) -> type[BasicVal]:
     """What Python type does this variable expect?"""
     if "%" in var:
         return int
@@ -19,17 +25,17 @@ def var_type(var: str):
         return float
 
 
-def bool2float(bval):
+def bool2float(bval: float) -> int:
     """BASIC bools are -1 for true, 0 for false. Convert Python to BASIC."""
     return -1 if bval else 0
 
 
-def float2int(fval):
+def float2int(fval: float) -> int:
     """When an int is expected, a float is ok, and will be floor'ed."""
     return int(math.floor(fval))
 
 
-def print_repr(value):
+def print_repr(value: float) -> str:
     """Create the string version of a number for printing."""
     prepr = ""
     if value >= 0:
@@ -44,18 +50,20 @@ def print_repr(value):
 class Array:
     """A multi-dimensional array."""
 
-    def __init__(self, errfn, dims: Iterable[int], default: Any):
+    def __init__(
+        self, errfn: Callable[[str], None], dims: Iterable[int], default: BasicVal
+    ) -> None:
         self.errfn = errfn
         self.dims = tuple(dims)
         if any(d < 1 for d in self.dims):
             self.errfn("Negative array dim")
         self.default = default
-        self.data: dict[tuple[int, ...], Any] = {}
+        self.data: dict[tuple[int, ...], BasicVal] = {}
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"Array({','.join(map(str, self.dims))})"
 
-    def check_args(self, *args):
+    def check_args(self, *args: int) -> None:
         if len(args) != len(self.dims):
             self.errfn("Mismatched array dimensions")
         if any(a < 0 for a in args):
@@ -64,22 +72,22 @@ class Array:
             if a > d:
                 self.errfn("Out of array bounds")
 
-    def get(self, *args):
+    def get(self, *args: int) -> BasicVal:
         self.check_args(*args)
         return self.data.get(args, self.default)
 
-    def set(self, val, *args):
+    def set(self, val: BasicVal, *args: int) -> None:
         self.check_args(*args)
         self.data[args] = val
 
 
 class StatementPointer:
-    def __init__(self, program, kind, label=None):
+    def __init__(self, program: Program, kind: str, label: int | None = None) -> None:
         self.program = program
         self.kind = kind
         self.jump(label or self.program.first)
 
-    def stmt(self):
+    def stmt(self) -> Ast | None:
         while True:
             if self.line_num is None:
                 return None
@@ -94,14 +102,15 @@ class StatementPointer:
             #     print(f"RUN {line_num}.{subline}: {stmt}")
             return stmt
 
-    def next_line(self):
+    def next_line(self) -> None:
+        assert self.line_num is not None
         self.jump(self.program.nexts.get(self.line_num))
 
-    def jump(self, line_num):
+    def jump(self, line_num: int | None) -> None:
         self.line_num = line_num
         self.subline = 0
 
-    def copy(self):
+    def copy(self) -> StatementPointer:
         sp = StatementPointer(self.program, self.kind)
         sp.line_num = self.line_num
         sp.subline = self.subline
@@ -120,20 +129,20 @@ class Loop:
 
 
 class Interpreter:
-    def __init__(self, program, instream, outstream):
+    def __init__(self, program: Program, instream: TextIO, outstream: TextIO) -> None:
         self.program = program
-        self.io = InOut(outstream, instream)
+        self.io = InOut(instream, outstream)
         self.running = True
         self.stmt_ptr = StatementPointer(self.program, "run")
-        self.call_stack = []
-        self.variables = {}
-        self.loops = []
+        self.call_stack: list[StatementPointer] = []
+        self.variables: dict[str, BasicValOrArray] = {}
+        self.loops: list[Loop] = []
         self.random = random.Random(314159)
-        self.last_rnd = 0
+        self.last_rnd = 0.0
         self.data_ptr = StatementPointer(self.program, "data")
-        self.cur_data = []
+        self.cur_data: list[tuple[str, ...]] = []
 
-    def run(self):
+    def run(self) -> None:
         while self.running:
             stmt = self.stmt_ptr.stmt()
             if stmt is None:
@@ -144,7 +153,7 @@ class Interpreter:
         msg += f" on line {self.stmt_ptr.line_num}"
         raise AcidicaError(msg)
 
-    def get_var(self, var, *args):
+    def get_var(self, var: str, *args: int) -> BasicVal:
         if args and not var.endswith("("):
             var += "("
         value = self.variables.get(var)
@@ -160,7 +169,7 @@ class Interpreter:
         # print(f"GET {var}{args}: {value!r}")
         return value
 
-    def set_var(self, var, val, *args):
+    def set_var(self, var: str, val: BasicVal, *args: int) -> None:
         if args and not var.endswith("("):
             var += "("
         # print(f"SET {var}{args} = {val!r}")
@@ -178,7 +187,7 @@ class Interpreter:
         else:
             self.variables[var] = val
 
-    def exec(self, node):
+    def exec(self, node: Ast) -> None:
         match node:
             case ("data", *vals):
                 pass
@@ -343,10 +352,10 @@ class Interpreter:
             case _NEVER:
                 self.error(f"Unimplemented: {node}")
 
-    def eval_var_args(self, args):
+    def eval_var_args(self, args: list[Ast]) -> list[int]:
         return [float2int(self.eval(a)) for a in args]
 
-    def eval(self, expr):
+    def eval(self, expr: Ast) -> BasicVal:
         try:
             match expr:
                 case ("value", value):
@@ -405,23 +414,20 @@ class Interpreter:
                         self.set_var(var, val)
                     ret = self.eval(expr)
                     for _, var in formals:
-                        val = saved[var]
-                        if val is not None:
-                            self.variables[var] = val
+                        oldval = saved[var]
+                        if oldval is not None:
+                            self.variables[var] = oldval
                     return ret
                 case _NEVER:
                     self.error(f"Unimplemented: {expr}")
         except TypeError:
-            import traceback
-
-            traceback.print_exc()
             self.error(f"Type mismatch for {expr[0]}")
 
-    def expects(self, nargs, fn, args):
+    def expects(self, nargs: int, fn: str, args: tuple[BasicVal, ...]) -> None:
         if len(args) != nargs:
             self.error(f"Wrong number of arguments for {fn}")
 
-    def function(self, fn, *args):
+    def function(self, fn: str, *args: BasicVal) -> BasicVal:
         try:
             match fn:
                 case "ABS":
@@ -460,22 +466,24 @@ class Interpreter:
                     self.expects(1, fn, args)
                     return math.log(args[0])
                 case "MID$":
+                    count: int | None = None
                     if len(args) == 3:
-                        s, start, num = args
-                        num = float2int(num)
+                        s, start, count = args
+                        assert count is not None
+                        count = float2int(count)
                     elif len(args) == 2:
                         s, start = args
-                        num = None
+                        count = None
                     else:
                         self.error("Wrong number of arguments for MID$")
                     start = float2int(start)
                     if start < 1:
                         self.error("Invalid argument for MID$")
                     s = s[start - 1 :]
-                    if num is not None:
-                        if num < 0:
+                    if count is not None:
+                        if count < 0:
                             self.error("Invalid argument for MID$")
-                        s = s[:num]
+                        s = s[:count]
                     return s
                 case "RIGHT$":
                     self.expects(2, fn, args)

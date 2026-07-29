@@ -8,7 +8,7 @@ from .parser import Parser
 from .interpreter import Interpreter
 
 
-def main():
+def main() -> None:
     if len(sys.argv) > 1:
         source = Path(sys.argv[1]).read_text()
     else:
@@ -17,7 +17,7 @@ def main():
         """)
     try:
         prog = Parser(source).parse()
-        if 0:
+        if 1:
             pprint.pprint(prog.lines)
             print("-" * 40)
         Interpreter(prog, sys.stdin, sys.stdout).run()

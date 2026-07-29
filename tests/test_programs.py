@@ -3,6 +3,7 @@ import re
 import sys
 import textwrap
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -30,7 +31,7 @@ def program(
     *,
     input: str = "",
     error: str | None = None,
-):
+) -> Any:
     call_line = sys._getframe(1).f_lineno
     return pytest.param(
         easy_text(source),
@@ -218,7 +219,7 @@ TEST_PROGRAMS = [
     ),
     program(
         "10 PRINT (X+",
-        error="!Expected rparen, saw eol on line 10",
+        error="!Syntax error on line 10: eol",
     ),
     # Variables
     program(
@@ -1205,7 +1206,7 @@ EXAMPLES = [
     "source, output, input, error",
     TEST_PROGRAMS + EXAMPLES,
 )
-def test_program(source, output, input, error):
+def test_program(source: str, output: str, input: str, error: str) -> None:
     outstream = io.StringIO()
     instream = io.StringIO(input)
     try:

@@ -8,7 +8,7 @@ class Token:
     kind: str
     text: str
 
-    def value(self):
+    def value(self) -> int | float | str:
         match self.kind:
             case "num":
                 try:
@@ -68,9 +68,9 @@ def tokenize(text: str) -> Iterator[Token]:
                 text = text.upper()
             if kind == "var":
                 # Only the first two letters and the first digit are significant.
-                m = re.fullmatch(r"([A-Z]{,2})[A-Z]*([0-9]?)[0-9]*([$%]?)", text)
-                assert m
-                text = "".join(m.groups())
+                mvar = re.fullmatch(r"([A-Z]{,2})[A-Z]*([0-9]?)[0-9]*([$%]?)", text)
+                assert mvar
+                text = "".join(mvar.groups())
             elif kind == "data":
                 text = text[4:].strip()
             yield Token(kind, text)
@@ -79,6 +79,6 @@ def tokenize(text: str) -> Iterator[Token]:
 DATA_TOKENS = r'\s*("[^"]*")|([^",][^,]*)'
 
 
-def parse_data(line):
+def parse_data(line: str) -> Iterator[str]:
     """Get values for INPUT or DATA."""
     return (v.group(0).strip().strip('"') for v in re.finditer(DATA_TOKENS, line))
