@@ -105,8 +105,6 @@ class Parser:
                         if self.tok == Token("key", "STEP"):
                             self.eat()
                             step = self.expr()
-                            if step is None:
-                                self.error()
                         else:
                             step = ("value", 1)
                         line.append(("for", for_var, start, end, step))
@@ -188,10 +186,7 @@ class Parser:
                                 case Token("colon", _) | Token("eol", _):
                                     break
                                 case _:
-                                    item = self.expr()
-                                    if item is None:
-                                        self.error()
-                                    items.append(item)
+                                    items.append(self.expr())
                         line.append(("print", *items))
 
                     case Token("key", "RANDOMIZE"):

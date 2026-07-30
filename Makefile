@@ -11,7 +11,7 @@ mypy:
 .PHONY: test
 
 test:
-	python -m pytest --cov=src --cov=tests --cov-context=test --cov-report=
+	python -m pytest --cov=src --cov=tests --cov-context=test --cov-report= tests
 	coverage report --show-missing --skip-covered
 	coverage html --show-contexts
 
