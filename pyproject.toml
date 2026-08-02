@@ -32,4 +32,4 @@ core = "ctrace"
 
 [tool.mutmut]
 mutate_only_covered_lines = true
-type_check_command = ["mypy", "src", "--output", "json", "--disable-error-code", "unused-ignore"]
+#type_check_command = ["mypy", "src", "--output", "json", "--disable-error-code", "unused-ignore"]
