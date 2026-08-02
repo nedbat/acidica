@@ -37,13 +37,12 @@ def float2int(fval: float) -> int:
 
 def print_repr(value: float) -> str:
     """Create the string version of a number for printing."""
-    prepr = ""
     if value >= 0:
-        prepr += " "
+        prepr = " "
+    else:
+        prepr = ""
 
     prepr += f"{value:.8g}"
-    if "." in prepr:
-        prepr = prepr.rstrip("0").rstrip(".")
     return prepr
 
 
