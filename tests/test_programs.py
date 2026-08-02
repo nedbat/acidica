@@ -874,7 +874,7 @@ TEST_PROGRAMS = [
     program(
         """
         10 read x, y, s$
-        20 data 17,   23,  Hello there
+        20 data17,   23,  "Hello there"
         30 print "the data:"; x; y; "x"; s$; "."
         40 data 23
         50 data Hello there
