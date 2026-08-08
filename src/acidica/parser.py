@@ -14,12 +14,24 @@ class Parser:
     def error(
         self,
         msg: str = "Syntax error",
-        line_num: bool = True,
-        token: bool = True,
+        *,
+        show_line_num: bool = True,
+        show_token: bool = True,
     ) -> Never:
-        if line_num:
+        """Raise an error exception.
+
+        Args:
+            msg: the text of the error message.
+            show_line_num: whether to include the current line number in the
+                message.
+            show_token: whether to include the current token in the message.
+
+        Always raises.
+
+        """
+        if show_line_num:
             msg += f" on line {self.line_num}"
-        if token:
+        if show_token:
             if self.tok.text:
                 msg += f": '{self.tok.text}'"
             else:
@@ -30,11 +42,12 @@ class Parser:
         if kind is not None and self.tok.kind != kind:
             self.error(
                 f"Expected {text or kind}, saw {self.tok.text or self.tok.kind}",
-                token=False,
+                show_token=False,
             )
         elif text is not None and self.tok.text != text:
             self.error(
-                f"Expected {text}, saw {self.tok.text or self.tok.kind}", token=False
+                f"Expected {text}, saw {self.tok.text or self.tok.kind}",
+                show_token=False,
             )
         text = self.tok.text
         self.tok = next(self.toks)
@@ -51,14 +64,14 @@ class Parser:
                     break
                 continue
             if self.tok.kind != "num":
-                self.error("No line number", line_num=False)
-            self.line_num = self.label(line_num=False)
+                self.error("No line number", show_line_num=False)
+            self.line_num = self.label(show_line_num=False)
 
             if self.line_num in lines:
                 self.error(
                     f"Duplicate line number {self.line_num}",
-                    token=False,
-                    line_num=False,
+                    show_token=False,
+                    show_line_num=False,
                 )
 
             line: list[Ast] = []
@@ -223,14 +236,14 @@ class Parser:
 
     def label(
         self,
-        line_num: bool = True,
-        token: bool = True,
+        *,
+        show_line_num: bool = True,
     ) -> int:
         if self.tok.kind != "num":
             self.error()
         label = self.tok.value()
         if not isinstance(label, int) or label < 0:
-            self.error("Bad label", line_num, token)
+            self.error("Bad label", show_line_num=show_line_num)
         self.eat()
         return label
 
