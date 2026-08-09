@@ -2,8 +2,10 @@ import dataclasses
 import math
 import random
 import time
-from typing import Any, Callable, TextIO, Iterable, Never
+from collections.abc import Callable
+from typing import Any, TextIO, Iterable, Never
 
+from .covertools import coverage_per_caller
 from .exceptions import AcidicaError
 from .inout import InOut
 from .program import Ast, Program
@@ -423,6 +425,7 @@ class Interpreter:
         except TypeError:
             self.error(f"Type mismatch for {expr[0]}")
 
+    @coverage_per_caller
     def expects(self, nargs: int, fn: str, args: tuple[BasicVal, ...]) -> None:
         if len(args) != nargs:
             self.error(f"Wrong number of arguments for {fn}")

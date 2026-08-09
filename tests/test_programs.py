@@ -577,6 +577,12 @@ TEST_PROGRAMS = [
     ),
     program(
         """
+        10 print asc(10, 20)
+        """,
+        error="!Wrong number of arguments for ASC on line 10",
+    ),
+    program(
+        """
         10 print left$("Hello", -1)
         """,
         error="!Invalid argument for LEFT$ on line 10",

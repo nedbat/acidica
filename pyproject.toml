@@ -24,6 +24,8 @@ acidica = "acidica.main:main"
 exclude_also = [
     # Don't complain about missing default cases that are never meant to happen.
     "case _NEVER:",
+    # Make it possible to exclude an entire file.
+    "\\A(?s:.*# coverage: exclude file.*)\\Z",
 ]
 
 [tool.coverage.run]
