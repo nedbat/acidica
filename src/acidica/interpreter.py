@@ -84,21 +84,22 @@ class StatementPointer:
     def __init__(self, program: Program, kind: str, label: int | None = None) -> None:
         self.program = program
         self.kind = kind
+        self.line_num: int | None = 0
+        self.sub_line = 0
         self.jump(label or self.program.first)
 
     def stmt(self) -> Ast | None:
         while True:
             if self.line_num is None:
                 return None
-            # line_num, subline = self.line_num
             line = self.program.lines[self.line_num]
-            if self.subline >= len(line):
+            if self.sub_line >= len(line):
                 self.next_line()
                 continue
-            stmt = line[self.subline]
-            self.subline += 1
+            stmt = line[self.sub_line]
+            self.sub_line += 1
             # if self.kind == "run":
-            #     print(f"RUN {line_num}.{subline}: {stmt}")
+            #     print(f"RUN {self.line_num}.{self.sub_line}: {stmt}")
             return stmt
 
     def next_line(self) -> None:
@@ -107,12 +108,12 @@ class StatementPointer:
 
     def jump(self, line_num: int | None) -> None:
         self.line_num = line_num
-        self.subline = 0
+        self.sub_line = 0
 
     def copy(self) -> StatementPointer:
         sp = StatementPointer(self.program, self.kind)
         sp.line_num = self.line_num
-        sp.subline = self.subline
+        sp.sub_line = self.sub_line
         return sp
 
 
