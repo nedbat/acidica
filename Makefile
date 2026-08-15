@@ -1,12 +1,13 @@
-.PHONY: typecheck
+.PHONY: ty mypy
 
-typecheck:
+ty:
 	ty check src tests
-
-.PHONY: mypy
 
 mypy:
 	mypy --strict src tests
+
+pyright:
+	pyright
 
 .PHONY: test
 

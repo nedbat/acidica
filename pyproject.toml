@@ -8,12 +8,16 @@ dependencies = []
 
 [dependency-groups]
 dev = [
+    "basedpyright>=1.39.9",
     "coverage>=7.15.0",
     "mutmut>=3.6.0",
     "mypy>=2.3.0",
+    "pyrefly>=1.2.0",
+    "pyright>=1.1.411",
     "pytest>=9.1.1",
     "pytest-cov>=7.1.0",
     "ty>=0.0.58",
+    "zuban>=0.9.1",
 ]
 
 [project.scripts]
@@ -35,3 +39,6 @@ core = "ctrace"
 [tool.mutmut]
 mutate_only_covered_lines = true
 type_check_command = ["mypy", "src", "--output", "json", "--disable-error-code", "unused-ignore"]
+
+[tool.pyright]
+typeCheckingMode = "strict"
