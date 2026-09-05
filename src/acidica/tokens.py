@@ -23,21 +23,17 @@ class Token:
                 raise Exception("Can't happen")
 
 
-KEYWORDS = "|".join(
+KEYWORDS = r"""
+    DEF|FN|DIM|END|FOR|TO|STEP|GO|SUB|IF|THEN|INPUT|LET|NEXT|ON|PRINT|
+    RANDOMIZE|READ|RESTORE|RETURN|STOP
     """
-    DEF FN DIM END FOR TO STEP GO SUB IF THEN INPUT LET NEXT ON PRINT 
-    RANDOMIZE READ RESTORE RETURN STOP
-    """.split()
-)
 
-FUNCTIONS = "|".join(
-    r"""
-    ABS ASC ATN CHR\$ COS EXP INT LEFT\$ LEN LOG MID\$ RIGHT\$ RND SGN SIN SPC
-    SQR STR\$ TAB TAN VAL
-    """.split()
-)
+FUNCTIONS = r"""
+    ABS|ASC|ATN|CHR\$|COS|EXP|INT|LEFT\$|LEN|LOG|MID\$|RIGHT\$|RND|SGN|SIN|SPC|
+    SQR|STR\$|TAB|TAN|VAL
+    """
 
-OPWORDS = "|".join("NOT AND OR".split())
+OPWORDS = r"NOT|AND|OR"
 
 TOKENS = rf"""(?xmi)
     (?P<data>DATA.*$)                                   |
