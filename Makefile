@@ -1,3 +1,10 @@
+.PHONY: test
+
+test:
+	python -m pytest --cov=src --cov=tests --cov-context=test --cov-report= tests
+	coverage report --show-missing --skip-covered
+	coverage html --show-contexts
+
 .PHONY: ty mypy
 
 ty:
@@ -8,13 +15,6 @@ mypy:
 
 pyright:
 	pyright
-
-.PHONY: test
-
-test:
-	python -m pytest --cov=src --cov=tests --cov-context=test --cov-report= tests
-	coverage report --show-missing --skip-covered
-	coverage html --show-contexts
 
 .PHONY: clean
 
