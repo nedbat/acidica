@@ -20,7 +20,9 @@ else:
         @functools.wraps(func)
         def _wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
             cov = coverage.Coverage.current()
-            if cov is not None:
+            if cov is None:
+                ret = func(*args, **kwargs)
+            else:
                 assert cov._data is not None
                 me = inspect.currentframe()
                 assert me is not None
@@ -30,10 +32,9 @@ else:
                 new_context = f"per_caller:{func_name}:{caller.f_code.co_filename}:{caller.f_lineno}"
                 prev_context = cov.switch_context(new_context)
                 assert prev_context is not None
-            try:
-                ret = func(*args, **kwargs)
-            finally:
-                if cov is not None:
+                try:
+                    ret = func(*args, **kwargs)
+                finally:
                     cov.switch_context(prev_context)
             return ret
 
