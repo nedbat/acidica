@@ -14,7 +14,7 @@ mypy:
 	mypy --strict src tests
 
 pyright:
-	pyright
+	pyright src tests
 
 .PHONY: clean
 
