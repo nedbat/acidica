@@ -425,7 +425,7 @@ class Interpreter:
         except TypeError:
             self.error(f"Type mismatch for {expr[0]}")
 
-    #@coverage_per_caller
+    @coverage_per_caller
     def expects(self, nargs: int, fn: str, args: tuple[BasicVal, ...]) -> None:
         if len(args) != nargs:
             self.error(f"Wrong number of arguments for {fn}")
