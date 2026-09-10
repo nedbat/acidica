@@ -20,11 +20,11 @@ if has_coverage:
     def coverage_per_caller(func: Callable[P, R]) -> Callable[P, R]:  # pyright: ignore[reportRedeclaration]
         @functools.wraps(func)
         def _wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-            cov = coverage.Coverage.current()
+            cov = coverage.Coverage.current()  # pyright: ignore[reportPossiblyUnboundVariable]
             if cov is None:
                 ret = func(*args, **kwargs)
             else:
-                assert cov._data is not None
+                assert cov._data is not None  # pyright: ignore[reportPrivateUsage]
                 me = inspect.currentframe()
                 assert me is not None
                 caller = me.f_back
