@@ -32,7 +32,7 @@ def program(
     input: str = "",
     error: str | None = None,
 ) -> Any:
-    call_line = sys._getframe(1).f_lineno
+    call_line = sys._getframe(1).f_lineno  # pyright: ignore[reportPrivateUsage]
     return pytest.param(
         easy_text(source),
         easy_text(output),

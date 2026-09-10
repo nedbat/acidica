@@ -180,7 +180,7 @@ class Parser:
                             op = "ongosub"
                         else:
                             self.error()
-                        labels = []
+                        labels: list[int] = []
                         while True:
                             labels.append(self.label())
                             if self.tok.kind != "comma":
@@ -255,7 +255,7 @@ class Parser:
         return ("let", ("var", var, *args), self.expr())
 
     def var_list(self) -> list[Ast]:
-        vars = []
+        vars: list[Ast] = []
         while True:
             vars.append(self.one_var())
             if self.tok.kind != "comma":
@@ -268,7 +268,7 @@ class Parser:
         return ("var", var, *self.arg_list())
 
     def arg_list(self) -> list[Ast]:
-        args = []
+        args: list[Ast] = []
         if self.tok.kind == "lparen":
             self.eat()
             while True:
