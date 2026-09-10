@@ -191,7 +191,7 @@ class Interpreter:
 
     def exec(self, node: Ast) -> None:
         match node:
-            case ("data", *vals):
+            case ("data", *_):
                 pass
 
             case ("def", ("var", var, *args), expr):
@@ -243,7 +243,7 @@ class Interpreter:
             case ("input", msg, *vars):
                 self.io.prompt(f"{msg}? ")
                 while True:
-                    vals = []
+                    vals: list[str] = []
                     while True:
                         line = self.io.readline()
                         vals.extend(parse_data(line))
