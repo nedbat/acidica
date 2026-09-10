@@ -10,13 +10,14 @@ R = TypeVar("R")
 
 try:
     import coverage
-except:  # pragma: no cover
 
-    def coverage_per_caller(func: Callable[P, R]) -> Callable[P, R]:
-        return func
-else:
+    has_coverage = True
+except ImportError:  # pragma: no cover
+    has_coverage = False
 
-    def coverage_per_caller(func: Callable[P, R]) -> Callable[P, R]:
+if has_coverage:
+
+    def coverage_per_caller(func: Callable[P, R]) -> Callable[P, R]:  # pyright: ignore[reportRedeclaration]
         @functools.wraps(func)
         def _wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
             cov = coverage.Coverage.current()
@@ -39,3 +40,7 @@ else:
             return ret
 
         return _wrapper
+else:
+
+    def coverage_per_caller(func: Callable[P, R]) -> Callable[P, R]:
+        return func
