@@ -409,7 +409,7 @@ class Interpreter:
                     if len(formals) != len(args):
                         self.error(f"Wrong number of arguments for function {var}")
                     args = self.eval_var_args(args)
-                    saved = {}
+                    saved: dict[str, BasicValOrArray] = {}
                     for (kind, var), val in zip(formals, args):
                         assert kind == "var"
                         saved[var] = self.variables.get(var)
