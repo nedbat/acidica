@@ -22,4 +22,4 @@ def main() -> None:
             print("-" * 40)
         Interpreter(prog, sys.stdin, sys.stdout).run()
     except AcidicaError as e:
-        print(str(e))
+        print(e)
