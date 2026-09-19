@@ -13,7 +13,7 @@ from .tokens import parse_data
 
 
 # Actually: `int | float | str`, but eval() is too dynamic, so punt.
-type BasicVal = Any 
+type BasicVal = Any
 type BasicValOrArray = Any
 
 
@@ -83,9 +83,17 @@ class Array:
 
 
 class StatementPointer:
-    def __init__(self, program: Program, kind: str, label: int | None = None) -> None:
+    def __init__(
+        self,
+        program: Program,
+        kind: str,
+        label: int | None = None,
+        *,
+        tracefn: Callable[[str], None],
+    ) -> None:
         self.program = program
         self.kind = kind
+        self.tracefn = tracefn
         self.line_num: int | None = 0
         self.sub_line = 0
         self.jump(label or self.program.first)
@@ -109,11 +117,12 @@ class StatementPointer:
         self.jump(self.program.nexts.get(self.line_num))
 
     def jump(self, line_num: int | None) -> None:
+        self.tracefn(f"{'GOTO' if self.kind == 'run' else 'DATA'} line {line_num}")
         self.line_num = line_num
         self.sub_line = 0
 
     def copy(self) -> StatementPointer:
-        sp = StatementPointer(self.program, self.kind)
+        sp = StatementPointer(self.program, self.kind, tracefn=self.tracefn)
         sp.line_num = self.line_num
         sp.sub_line = self.sub_line
         return sp
@@ -130,18 +139,32 @@ class Loop:
     end: float
 
 
+def no_trace(event: str) -> None:
+    pass
+
+
 class Interpreter:
-    def __init__(self, program: Program, instream: TextIO, outstream: TextIO) -> None:
+    def __init__(
+        self,
+        program: Program,
+        instream: TextIO,
+        outstream: TextIO,
+        tracefn: Callable[[str], None] | None = None,
+    ) -> None:
         self.program = program
         self.io = InOut(instream, outstream)
+        if tracefn is not None:
+            self.tracefn = tracefn
+        else:
+            self.tracefn = no_trace
         self.running = True
-        self.stmt_ptr = StatementPointer(self.program, "run")
+        self.stmt_ptr = StatementPointer(self.program, "run", tracefn=self.tracefn)
         self.call_stack: list[StatementPointer] = []
         self.variables: dict[str, BasicValOrArray] = {}
         self.loops: list[Loop] = []
         self.random = random.Random(314159)
         self.last_rnd = 0.0
-        self.data_ptr = StatementPointer(self.program, "data")
+        self.data_ptr = StatementPointer(self.program, "data", tracefn=self.tracefn)
         self.cur_data: list[tuple[str, ...]] = []
 
     def run(self) -> None:
@@ -154,6 +177,14 @@ class Interpreter:
     def error(self, msg: str) -> Never:
         msg += f" on line {self.stmt_ptr.line_num}"
         raise AcidicaError(msg)
+
+    def trace_var(self, verb: str, var: str, *args: int, val: BasicVal) -> None:
+        if args:
+            show_args = f"({', '.join(map(str, args))})"
+        else:
+            show_args = ""
+        punct = ":" if verb == "GET" else " ="
+        self.tracefn(f"{verb} {var.rstrip('(')}{show_args}{punct} {val!r}")
 
     def get_var(self, var: str, *args: int) -> BasicVal:
         if args and not var.endswith("("):
@@ -168,13 +199,13 @@ class Interpreter:
         else:
             if isinstance(value, Array):
                 value = value.get(*args)
-        # print(f"GET {var}{args}: {value!r}")
+        self.trace_var("GET", var, *args, val=value)
         return value
 
     def set_var(self, var: str, val: BasicVal, *args: int) -> None:
+        self.trace_var("SET", var, *args, val=val)
         if args and not var.endswith("("):
             var += "("
-        # print(f"SET {var}{args} = {val!r}")
         vtype = var_type(var)
         if vtype is int and isinstance(val, float):
             val = float2int(val)
@@ -226,7 +257,9 @@ class Interpreter:
                 if line_num not in self.program.lines:
                     self.error(f"Bad GOSUB target {line_num}")
                 self.call_stack.append(self.stmt_ptr)
-                self.stmt_ptr = StatementPointer(self.program, "run", line_num)
+                self.stmt_ptr = StatementPointer(
+                    self.program, "run", line_num, tracefn=self.tracefn
+                )
 
             case ("goto", line_num):
                 if line_num not in self.program.lines:
@@ -294,7 +327,9 @@ class Interpreter:
                     if line_num not in self.program.lines:
                         self.error(f"Bad ON GOSUB target {line_num}")
                     self.call_stack.append(self.stmt_ptr)
-                    self.stmt_ptr = StatementPointer(self.program, "run", line_num)
+                    self.stmt_ptr = StatementPointer(
+                        self.program, "run", line_num, tracefn=self.tracefn
+                    )
 
             case ("ongoto", expr, *labels):
                 num = float2int(self.eval(expr))
