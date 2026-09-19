@@ -10,6 +10,7 @@ from .interpreter import Interpreter
 
 def main() -> None:
     parser = argparse.ArgumentParser()
+    parser.add_argument("--dump", help="Dump the parsed code", action="store_true")
     parser.add_argument("--trace", help="Trace the execution", action="store_true")
     parser.add_argument("file")
     args = parser.parse_args()
@@ -17,7 +18,7 @@ def main() -> None:
     source = Path(args.file).read_text()
     try:
         prog = Parser(source).parse()
-        if 0:
+        if args.dump:
             pprint.pprint(prog.lines)
             print("-" * 40)
         tracefn = print if args.trace else None
