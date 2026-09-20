@@ -10,7 +10,9 @@ from .interpreter import Interpreter
 
 def main() -> None:
     parser = argparse.ArgumentParser()
+    parser.add_argument("--blocks", help="Analyze the blocks", action="store_true")
     parser.add_argument("--dump", help="Dump the parsed code", action="store_true")
+    parser.add_argument("--norun", help="Don't run the code", action="store_true")
     parser.add_argument("--trace", help="Trace the execution", action="store_true")
     parser.add_argument("file")
     args = parser.parse_args()
@@ -21,7 +23,10 @@ def main() -> None:
         if args.dump:
             pprint.pprint(prog.lines)
             print("-" * 40)
-        tracefn = print if args.trace else None
-        Interpreter(prog, sys.stdin, sys.stdout, tracefn=tracefn).run()
+        if args.blocks:
+            pass
+        if not args.norun:
+            tracefn = print if args.trace else None
+            Interpreter(prog, sys.stdin, sys.stdout, tracefn=tracefn).run()
     except AcidicaError as e:
         print(e)
